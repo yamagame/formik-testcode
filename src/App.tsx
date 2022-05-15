@@ -70,13 +70,10 @@ const validationSchema = (forcusState: ForcusState) => {
   return yup.object().shape({
     name: yup.lazy((name) => {
       if (forcusState.name) {
-        console.log("A");
         return yup
           .string()
           .matches(/^[a-zA-Z]*$/)
           .required();
-      } else {
-        console.log("B");
       }
       return yup
         .string()

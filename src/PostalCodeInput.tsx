@@ -50,7 +50,6 @@ export function PostalCodeInput(props: PostalCodeInputProps) {
       onChange={(e) => {
         const { value: postalCode, position: selectionStart } =
           convertPostalCode(e.target.value, e.target.selectionStart);
-        console.log(selectionStart);
         setCursor(selectionStart);
         onChange(postalCode.replace("-", ""));
       }}
