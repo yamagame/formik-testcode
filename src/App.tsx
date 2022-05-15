@@ -1,6 +1,7 @@
 import React from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { PostalCodeInput } from "./PostalCodeInput";
 
 type FormProps = {
   name: string;
@@ -10,15 +11,6 @@ type FormProps = {
 };
 
 const fruits = [{ name: "apple" }, { name: "pine" }, { name: "orange" }];
-
-const convertPostalCode = (postalCode: string) => {
-  if (postalCode.indexOf("-") === 3) return postalCode;
-  const code = postalCode.replace("-", "");
-  const f = code.substring(0, 3);
-  const e = code.substring(3);
-  if (e !== "") return `${f}-${e}`;
-  return f;
-};
 
 type State = { name: string; star: number; fruit: string; postalCode: string };
 
@@ -36,7 +28,6 @@ function reducer(state: State, action: Action) {
 }
 
 function App() {
-  // const [postalCode, setPostalCode] = React.useState("");
   const [state, dispatch] = React.useReducer(reducer, initialState);
 
   const formik = useFormik<FormProps>({
@@ -50,14 +41,15 @@ function App() {
       name: yup.string().required(),
       star: yup.number().required().positive().integer(),
       fruit: yup.string().required(),
-      postalCode: yup.string().required(),
+      postalCode: yup
+        .string()
+        .matches(/^[0-9]{3}[0-9]{4}$/)
+        .required(),
     }),
     onSubmit: (values) => {
       dispatch({ type: "update", payload: values });
     },
   });
-
-  const postalCode = convertPostalCode(formik.values.postalCode);
 
   return (
     <div style={{ margin: 30 }}>
@@ -71,13 +63,12 @@ function App() {
         }}
       >
         <div>
-          <input
-            type="text"
-            placeholder="postalCode"
+          <PostalCodeInput
             name="postalCode"
-            value={postalCode}
-            maxLength={8}
-            onChange={formik.handleChange}
+            value={formik.values.postalCode}
+            onChange={(value: string) => {
+              formik.setFieldValue("postalCode", value);
+            }}
           />
           <span>{formik.touched.postalCode && formik.errors.postalCode}</span>
         </div>
