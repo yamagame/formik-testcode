@@ -34,13 +34,13 @@ type PostalCodeInputProps = {
 };
 
 export function PostalCodeInput(props: PostalCodeInputProps) {
-  const [cursor, setCursor] = React.useState(0);
+  // const [cursor, setCursor] = React.useState(0);
   const { name, value, onChange } = props;
   return (
     <input
-      ref={(input) =>
-        input && (input.selectionStart = input.selectionEnd = cursor)
-      }
+      // ref={(input) =>
+      //   input && (input.selectionStart = input.selectionEnd = cursor)
+      // }
       type="text"
       placeholder={name}
       name={name}
@@ -49,7 +49,8 @@ export function PostalCodeInput(props: PostalCodeInputProps) {
       onChange={(e) => {
         const { value: postalCode, position: selectionStart } =
           convertPostalCode(e.target.value, e.target.selectionStart);
-        setCursor(selectionStart);
+        console.log(selectionStart);
+        // setCursor(selectionStart);
         onChange(postalCode.replace("-", ""));
       }}
     />
