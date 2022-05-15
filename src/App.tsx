@@ -12,13 +12,25 @@ type FormProps = {
 
 const fruits = [{ name: "apple" }, { name: "pine" }, { name: "orange" }];
 
-type State = { name: string; star: number; fruit: string; postalCode: string };
+type SubmitState = {
+  name: string;
+  star: number;
+  fruit: string;
+  postalCode: string;
+};
 
-const initialState: State = { name: "", star: 0, fruit: "", postalCode: "" };
+const initialValues = {
+  name: "",
+  star: 0,
+  fruit: "",
+  postalCode: "",
+};
 
-type Action = { type: "update"; payload: State };
+const submitInitialState: SubmitState = initialValues;
 
-function reducer(state: State, action: Action) {
+type SubmitAction = { type: "update"; payload: SubmitState };
+
+function submitReducer(state: SubmitState, action: SubmitAction) {
   switch (action.type) {
     case "update":
       return { ...state, ...action.payload };
@@ -27,25 +39,69 @@ function reducer(state: State, action: Action) {
   }
 }
 
+type ForcusState = {
+  name?: boolean;
+  star?: boolean;
+  fruit?: boolean;
+  postalCode?: boolean;
+};
+
+type ForcusAction = { type: "set"; payload: ForcusState } | { type: "reset" };
+
+const focusInitialState: ForcusState = {
+  name: false,
+  star: false,
+  fruit: false,
+  postalCode: false,
+};
+
+function forcusReducer(state: ForcusState, action: ForcusAction) {
+  switch (action.type) {
+    case "set":
+      return { ...state, ...action.payload };
+    case "reset":
+      return { ...focusInitialState };
+    default:
+      throw new Error();
+  }
+}
+
+const validationSchema = (forcusState: ForcusState) => {
+  return yup.object().shape({
+    name: yup.lazy((name) => {
+      if (forcusState.name) {
+        console.log("A");
+        return yup
+          .string()
+          .matches(/^[a-zA-Z]*$/)
+          .required();
+      } else {
+        console.log("B");
+      }
+      return yup
+        .string()
+        .matches(/^[A-Z]*$/)
+        .required();
+    }),
+    star: yup.number().required().positive().integer(),
+    fruit: yup.string().required(),
+    postalCode: yup
+      .string()
+      .matches(/^[0-9]{3}[0-9]{4}$/)
+      .required(),
+  });
+};
+
 function App() {
-  const [state, dispatch] = React.useReducer(reducer, initialState);
+  const [state, dispatch] = React.useReducer(submitReducer, submitInitialState);
+  const [forcusState, forcusDispatch] = React.useReducer(
+    forcusReducer,
+    focusInitialState
+  );
 
   const formik = useFormik<FormProps>({
-    initialValues: {
-      name: "",
-      star: 0,
-      fruit: "",
-      postalCode: "",
-    },
-    validationSchema: yup.object().shape({
-      name: yup.string().required(),
-      star: yup.number().required().positive().integer(),
-      fruit: yup.string().required(),
-      postalCode: yup
-        .string()
-        .matches(/^[0-9]{3}[0-9]{4}$/)
-        .required(),
-    }),
+    initialValues: submitInitialState,
+    validationSchema: validationSchema(forcusState),
     onSubmit: (values) => {
       dispatch({ type: "update", payload: values });
     },
@@ -55,9 +111,13 @@ function App() {
     <div style={{ margin: 30 }}>
       <div>Hello React</div>
       <form
-        onSubmit={formik.handleSubmit}
+        onSubmit={(e) => {
+          forcusDispatch({ type: "reset" });
+          formik.handleSubmit(e);
+        }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
+            forcusDispatch({ type: "reset" });
             formik.handleSubmit();
           }
         }}
@@ -77,7 +137,18 @@ function App() {
             type="text"
             placeholder="name"
             name="name"
-            onChange={formik.handleChange}
+            value={formik.values.name}
+            onChange={(e) => {
+              forcusDispatch({ type: "set", payload: { name: false } });
+              formik.handleChange(e);
+            }}
+            onBlur={(e) => {
+              formik.setFieldValue("name", e.target.value.toUpperCase());
+              forcusDispatch({ type: "set", payload: { name: false } });
+            }}
+            onFocus={() => {
+              forcusDispatch({ type: "set", payload: { name: true } });
+            }}
           />
           <span>{formik.touched.name && formik.errors.name}</span>
         </div>
@@ -85,6 +156,7 @@ function App() {
           <input
             type="text"
             placeholder="star"
+            value={formik.values.star}
             name="star"
             onChange={formik.handleChange}
           />
