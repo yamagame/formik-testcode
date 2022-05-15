@@ -122,7 +122,7 @@ function App() {
           }
         }}
       >
-        <div>
+        {/* <div>
           <PostalCodeInput
             name="postalCode"
             value={formik.values.postalCode}
@@ -131,7 +131,7 @@ function App() {
             }}
           />
           <span>{formik.touched.postalCode && formik.errors.postalCode}</span>
-        </div>
+        </div> */}
         <div>
           <input
             type="text"
