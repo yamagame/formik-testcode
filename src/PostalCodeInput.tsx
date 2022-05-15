@@ -34,13 +34,13 @@ type PostalCodeInputProps = {
 };
 
 export function PostalCodeInput(props: PostalCodeInputProps) {
+  const [focus, setFocus] = React.useState(false);
   const [cursor, setCursor] = React.useState(0);
   const { name, value, onChange } = props;
   return (
     <input
-      ref={
-        (input) => input && console.log(cursor)
-        // input && (input.selectionStart = input.selectionEnd = cursor)
+      ref={(input) =>
+        input && focus && (input.selectionStart = input.selectionEnd = cursor)
       }
       type="text"
       placeholder={name}
@@ -54,6 +54,8 @@ export function PostalCodeInput(props: PostalCodeInputProps) {
         setCursor(selectionStart);
         onChange(postalCode.replace("-", ""));
       }}
+      onBlur={() => setFocus(false)}
+      onFocus={() => setFocus(true)}
     />
   );
 }
