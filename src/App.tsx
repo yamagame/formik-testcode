@@ -2,12 +2,14 @@ import React from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { PostalCodeInput } from "./PostalCodeInput";
+import { DigitInput } from "./DigitInput";
 
 type FormProps = {
   name: string;
   star: number;
   fruit: string;
   postalCode: string;
+  number: string;
 };
 
 const fruits = [{ name: "apple" }, { name: "pine" }, { name: "orange" }];
@@ -17,6 +19,7 @@ type SubmitState = {
   star: number;
   fruit: string;
   postalCode: string;
+  number: string;
 };
 
 const initialValues = {
@@ -24,6 +27,7 @@ const initialValues = {
   star: 0,
   fruit: "",
   postalCode: "",
+  number: "",
 };
 
 const submitInitialState: SubmitState = initialValues;
@@ -44,6 +48,7 @@ type ForcusState = {
   star?: boolean;
   fruit?: boolean;
   postalCode?: boolean;
+  number?: boolean;
 };
 
 type ForcusAction = { type: "set"; payload: ForcusState } | { type: "reset" };
@@ -53,6 +58,7 @@ const focusInitialState: ForcusState = {
   star: false,
   fruit: false,
   postalCode: false,
+  number: false,
 };
 
 function forcusReducer(state: ForcusState, action: ForcusAction) {
@@ -85,6 +91,10 @@ const validationSchema = (forcusState: ForcusState) => {
     postalCode: yup
       .string()
       .matches(/^[0-9]{3}[0-9]{4}$/)
+      .required(),
+    number: yup
+      .string()
+      .matches(/^[0-9]{4}[0-9]{4}[0-9]{4}[0-9]{4}$/)
       .required(),
   });
 };
@@ -131,6 +141,16 @@ function App() {
             }}
           />
           <span>{formik.touched.postalCode && formik.errors.postalCode}</span>
+        </div>
+        <div>
+          <DigitInput
+            name="number"
+            value={formik.values.number}
+            onChange={(value: string) => {
+              formik.setFieldValue("number", value);
+            }}
+          />
+          <span>{formik.touched.number && formik.errors.number}</span>
         </div>
         <div>
           <input
@@ -192,6 +212,14 @@ function App() {
       </form>
       <div style={{ marginTop: 30 }}>
         <div>
+          <span>postalCode: </span>
+          <span>{state.postalCode}</span>
+        </div>
+        <div>
+          <span>number: </span>
+          <span>{state.number}</span>
+        </div>
+        <div>
           <span>name: </span>
           <span>{state.name}</span>
         </div>
@@ -202,10 +230,6 @@ function App() {
         <div>
           <span>fruit: </span>
           <span>{state.fruit}</span>
-        </div>
-        <div>
-          <span>postalCode: </span>
-          <span>{state.postalCode}</span>
         </div>
       </div>
     </div>
