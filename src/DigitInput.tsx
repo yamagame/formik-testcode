@@ -23,12 +23,13 @@ function countSep(val: string) {
 }
 
 export function DigitInput(props: DigitInputProps) {
+  const [focus, setFocus] = React.useState(false);
   const [start, setStart] = React.useState(0);
   const [end, setEnd] = React.useState(0);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const { name, value, onChange } = props;
   React.useEffect(() => {
-    if (inputRef && inputRef.current) {
+    if (inputRef && inputRef.current && focus) {
       inputRef.current.setSelectionRange(start, end);
     }
   });
@@ -47,6 +48,8 @@ export function DigitInput(props: DigitInputProps) {
         setEnd((e.target.selectionEnd || 0) + delta);
         onChange(digitValue.replace("-", ""));
       }}
+      onBlur={() => setFocus(false)}
+      onFocus={() => setFocus(true)}
     />
   );
 }
