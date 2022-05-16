@@ -98,6 +98,8 @@ function App() {
 
   const formik = useFormik<FormProps>({
     initialValues: submitInitialState,
+    validateOnBlur: true,
+    validateOnChange: true,
     validationSchema: validationSchema(forcusState),
     onSubmit: (values) => {
       dispatch({ type: "update", payload: values });
@@ -111,12 +113,6 @@ function App() {
         onSubmit={(e) => {
           forcusDispatch({ type: "reset" });
           formik.handleSubmit(e);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            forcusDispatch({ type: "reset" });
-            formik.handleSubmit();
-          }
         }}
       >
         <div>
@@ -172,7 +168,7 @@ function App() {
           <span>{formik.touched.fruit && formik.errors.fruit}</span>
         </div>
         <div>
-          <input type="button" value="submit" onClick={formik.submitForm} />
+          <input type="submit" value="submit" />
         </div>
       </form>
       <div style={{ marginTop: 30 }}>
