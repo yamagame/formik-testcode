@@ -140,8 +140,9 @@ function App() {
               formik.handleChange(e);
             }}
             onBlur={(e) => {
-              formik.setFieldValue("name", e.target.value.toUpperCase());
               forcusDispatch({ type: "set", payload: { name: false } });
+              formik.setFieldTouched("name", false);
+              formik.setFieldValue("name", e.target.value.toUpperCase());
             }}
             onFocus={() => {
               forcusDispatch({ type: "set", payload: { name: true } });
