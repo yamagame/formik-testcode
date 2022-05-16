@@ -141,6 +141,7 @@ function App() {
               formik.setFieldValue("name", e.target.value.toUpperCase());
             }}
             onFocus={() => {
+              formik.setFieldTouched("name", false);
               forcusDispatch({ type: "set", payload: { name: true } });
             }}
           />
