@@ -91,6 +91,7 @@ const validationSchema = (forcusState: ForcusState) => {
 
 function App() {
   const [state, dispatch] = React.useReducer(submitReducer, submitInitialState);
+  const focusStateRef = React.useRef<ForcusState>({});
   const [focusState, focusDispatch] = React.useReducer(
     forcusReducer,
     focusInitialState
@@ -100,7 +101,7 @@ function App() {
     initialValues: submitInitialState,
     validateOnBlur: true,
     validateOnChange: true,
-    validationSchema: validationSchema(focusState),
+    validationSchema: validationSchema(focusStateRef.current),
     onSubmit: (values) => {
       dispatch({ type: "update", payload: values });
     },
@@ -115,7 +116,8 @@ function App() {
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
-            focusDispatch({ type: "reset" });
+            focusStateRef.current.name = false;
+            // focusDispatch({ type: "reset" });
             formik.handleSubmit();
           }
         }}
@@ -137,16 +139,19 @@ function App() {
             name="name"
             value={formik.values.name}
             onChange={(e) => {
+              // focusStateRef.current.name = true;
+              // focusDispatch({ type: "set", payload: { name: true } });
               formik.handleChange(e);
-              // forcusDispatch({ type: "set", payload: { name: true } });
               // formik.setFieldValue("name", e.target.value, true);
             }}
             onFocus={() => {
+              focusStateRef.current.name = true;
               // formik.setFieldTouched("name", false);
-              focusDispatch({ type: "set", payload: { name: false } });
+              // focusDispatch({ type: "set", payload: { name: false } });
             }}
             onBlur={(e) => {
-              focusDispatch({ type: "set", payload: { name: true } });
+              focusStateRef.current.name = false;
+              // focusDispatch({ type: "set", payload: { name: true } });
               // formik.setFieldTouched("name", false);
               formik.setFieldValue("name", e.target.value.toUpperCase());
             }}
@@ -178,7 +183,10 @@ function App() {
           <input
             type="submit"
             value="submit"
-            onClick={() => focusDispatch({ type: "reset" })}
+            onClick={() => {
+              focusStateRef.current.name = false;
+              // focusDispatch({ type: "reset" })
+            }}
           />
         </div>
       </form>
