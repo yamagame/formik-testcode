@@ -35,7 +35,7 @@ export function PostalCodeInput(props: PostalCodeInputProps) {
   return (
     <input
       ref={inputRef}
-      type="text"
+      type="tel"
       placeholder={name}
       name={name}
       value={postalCodeString(value)}

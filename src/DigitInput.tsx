@@ -36,7 +36,7 @@ export function DigitInput(props: DigitInputProps) {
   return (
     <input
       ref={inputRef}
-      type="text"
+      type="tel"
       placeholder={name}
       name={name}
       value={digitString(value)}
