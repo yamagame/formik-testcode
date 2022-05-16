@@ -91,7 +91,7 @@ const validationSchema = (forcusState: ForcusState) => {
 
 function App() {
   const [state, dispatch] = React.useReducer(submitReducer, submitInitialState);
-  const [forcusState, forcusDispatch] = React.useReducer(
+  const [focusState, focusDispatch] = React.useReducer(
     forcusReducer,
     focusInitialState
   );
@@ -100,7 +100,7 @@ function App() {
     initialValues: submitInitialState,
     validateOnBlur: true,
     validateOnChange: true,
-    validationSchema: validationSchema(forcusState),
+    validationSchema: validationSchema(focusState),
     onSubmit: (values) => {
       dispatch({ type: "update", payload: values });
     },
@@ -111,8 +111,13 @@ function App() {
       <div>Hello React</div>
       <form
         onSubmit={(e) => {
-          forcusDispatch({ type: "reset" });
           formik.handleSubmit(e);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            focusDispatch({ type: "reset" });
+            formik.handleSubmit();
+          }
         }}
       >
         <div>
@@ -132,17 +137,18 @@ function App() {
             name="name"
             value={formik.values.name}
             onChange={(e) => {
-              forcusDispatch({ type: "set", payload: { name: false } });
               formik.handleChange(e);
-            }}
-            onBlur={(e) => {
-              forcusDispatch({ type: "set", payload: { name: false } });
-              // formik.setFieldTouched("name", false);
-              formik.setFieldValue("name", e.target.value.toUpperCase());
+              // forcusDispatch({ type: "set", payload: { name: true } });
+              // formik.setFieldValue("name", e.target.value, true);
             }}
             onFocus={() => {
               // formik.setFieldTouched("name", false);
-              forcusDispatch({ type: "set", payload: { name: true } });
+              focusDispatch({ type: "set", payload: { name: false } });
+            }}
+            onBlur={(e) => {
+              focusDispatch({ type: "set", payload: { name: true } });
+              // formik.setFieldTouched("name", false);
+              formik.setFieldValue("name", e.target.value.toUpperCase());
             }}
           />
           <span>{formik.touched.name && formik.errors.name}</span>
@@ -169,7 +175,11 @@ function App() {
           <span>{formik.touched.fruit && formik.errors.fruit}</span>
         </div>
         <div>
-          <input type="submit" value="submit" />
+          <input
+            type="submit"
+            value="submit"
+            onClick={() => focusDispatch({ type: "reset" })}
+          />
         </div>
       </form>
       <div style={{ marginTop: 30 }}>
