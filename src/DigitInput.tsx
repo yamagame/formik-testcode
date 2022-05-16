@@ -46,7 +46,7 @@ export function DigitInput(props: DigitInputProps) {
         const delta = countSep(digitValue) - countSep(e.target.value);
         setStart((e.target.selectionStart || 0) + delta);
         setEnd((e.target.selectionEnd || 0) + delta);
-        onChange(digitValue.replace("-", ""));
+        onChange(digitValue.replace(/ /g, ""));
       }}
       onBlur={() => setFocus(false)}
       onFocus={() => setFocus(true)}
