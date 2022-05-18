@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { PostalCodeInput } from "./PostalCodeInput";
 import { DigitInput } from "./DigitInput";
-import { FormatNumberInput, formatString } from "./FormatNumberInput";
+import { FormatNumberInput } from "./FormatNumberInput";
 
 type FormProps = {
   name: string;
@@ -11,7 +11,7 @@ type FormProps = {
   fruit: string;
   postalCode: string;
   number: string;
-  format: string;
+  number2: string;
 };
 
 const fruits = [{ name: "apple" }, { name: "pine" }, { name: "orange" }];
@@ -22,7 +22,7 @@ type SubmitState = {
   fruit: string;
   postalCode: string;
   number: string;
-  format: string;
+  number2: string;
 };
 
 const initialValues = {
@@ -31,7 +31,7 @@ const initialValues = {
   fruit: "",
   postalCode: "",
   number: "",
-  format: "",
+  number2: "",
 };
 
 const submitInitialState: SubmitState = initialValues;
@@ -53,7 +53,7 @@ type ForcusState = {
   fruit?: boolean;
   postalCode?: boolean;
   number?: boolean;
-  format?: boolean;
+  number2?: boolean;
 };
 
 const validationSchema = (forcusState: ForcusState) => {
@@ -77,6 +77,10 @@ const validationSchema = (forcusState: ForcusState) => {
       .matches(/^[0-9]{3}[0-9]{4}$/)
       .required(),
     number: yup
+      .string()
+      .matches(/^[0-9]{4}[0-9]{4}[0-9]{4}[0-9]{4}$/)
+      .required(),
+    number2: yup
       .string()
       .matches(/^[0-9]{4}[0-9]{4}[0-9]{4}[0-9]{4}$/)
       .required(),
@@ -129,44 +133,34 @@ function App() {
               formik.setFieldValue("number", value);
             }}
           />
-          {/* <FormatNumberInput
-            type="tel"
-            value={formik.values.number}
-            placeholder="number"
-            name="number"
-            format={(value: string) => {
-              return formatString(value, "**** **** **** ****");
-            }}
-            maxLength={19}
-            onChange={(e) => {
-              const { value } = e.target;
-              formik.setFieldValue("number", value);
-            }}
-          /> */}
           <span>{formik.touched.number && formik.errors.number}</span>
         </div>
         <div>
           <FormatNumberInput
             type="tel"
-            value={formik.values.format}
-            placeholder="format string"
-            name="format"
+            value={formik.values.number2}
+            placeholder="number2 string"
+            name="number2"
             format={(value: string) => {
-              if (value[4] === "1") {
-                return formatString(value, "****-****-****-****");
+              if (value[2] === "1") {
+                return "**---******---****---****";
               }
-              if (value[4] === "2") {
-                return formatString(value, "**-******-****-****");
+              if (value[8] === "3") {
+                return "****-****-****-****";
               }
-              return formatString(value, "****************");
+              if (value[8] === "2") {
+                return "**-******-****-****";
+              }
+              return "****:****:****:****";
             }}
-            maxLength={19}
+            maxLength={25}
+            length={16}
             onChange={(e) => {
               const { value } = e.target;
-              formik.setFieldValue("format", value);
+              formik.setFieldValue("number2", value);
             }}
           />
-          <span>{formik.touched.number && formik.errors.number}</span>
+          <span>{formik.touched.number2 && formik.errors.number2}</span>
         </div>
         <div>
           <input
@@ -226,6 +220,10 @@ function App() {
         <div>
           <span>number: </span>
           <span>{state.number}</span>
+        </div>
+        <div>
+          <span>number2: </span>
+          <span>{state.number2}</span>
         </div>
         <div>
           <span>name: </span>

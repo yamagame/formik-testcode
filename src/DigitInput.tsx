@@ -1,4 +1,4 @@
-import { FormatNumberInput, formatString } from "./FormatNumberInput";
+import { FormatNumberInput } from "./FormatNumberInput";
 
 type DigitInputProps = {
   name: string;
@@ -13,10 +13,9 @@ export function DigitInput(props: DigitInputProps) {
       value={props.value}
       placeholder={props.name}
       name={props.name}
-      format={(value: string) => {
-        return formatString(value, "**** **** **** ****");
-      }}
+      format="**** **** **** ****"
       maxLength={19}
+      length={16}
       onChange={(e) => {
         const { value } = e.target;
         props.onChange(value);

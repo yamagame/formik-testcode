@@ -1,4 +1,4 @@
-import { FormatNumberInput, formatString } from "./FormatNumberInput";
+import { FormatNumberInput } from "./FormatNumberInput";
 
 type PostalCodeInputProps = {
   name: string;
@@ -13,10 +13,9 @@ export function PostalCodeInput(props: PostalCodeInputProps) {
       value={props.value}
       placeholder={props.name}
       name={props.name}
-      format={(value: string) => {
-        return formatString(value, "***-****");
-      }}
+      format="***-****"
       maxLength={8}
+      length={7}
       onChange={(e) => {
         const { value } = e.target;
         props.onChange(value);
