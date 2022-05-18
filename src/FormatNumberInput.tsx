@@ -74,7 +74,6 @@ export function FormatNumberInput(props: FormatInputProps) {
       onChange={(e) => {
         const { selectionStart, selectionEnd, value } = e.target;
         let numStr = numberString(value);
-        console.log(numStr, maxLength);
         if (props.maxLength && numStr.length > maxLength)
           numStr = numStr.substring(0, maxLength);
         const formatPattern = pattern(format, value);
