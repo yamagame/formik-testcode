@@ -23,7 +23,11 @@ type FormatInputProps = {
 } & InputHTMLAttributes<HTMLInputElement>;
 
 function numberString(val: string) {
-  return val.replace(/[^0-9]/g, "");
+  const zenkaku = "０１２３４５６７８９".split("");
+  const reg = new RegExp("(" + zenkaku.join("|") + ")", "g");
+  return val
+    .replace(reg, (match) => String(zenkaku.indexOf(match)))
+    .replace(/[^0-9]/g, "");
 }
 
 function countSep(val: string, start?: number) {
@@ -64,7 +68,7 @@ export function FormatNumberInput(props: FormatInputProps) {
       inputRef.current.setSelectionRange(start, end);
     }
   });
-  const maxLength = length || 256;
+  const maxLength = length || 0;
   const valueString = String(value || "");
   return (
     <input
@@ -74,7 +78,7 @@ export function FormatNumberInput(props: FormatInputProps) {
       onChange={(e) => {
         const { selectionStart, selectionEnd, value } = e.target;
         let numStr = numberString(value);
-        if (props.maxLength && numStr.length > maxLength)
+        if (props.maxLength && numStr.length > maxLength && maxLength > 0)
           numStr = numStr.substring(0, maxLength);
         const formatPattern = pattern(format, value);
         const formatValue = formatString(numStr, formatPattern);
