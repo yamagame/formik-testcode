@@ -3,6 +3,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { PostalCodeInput } from "./PostalCodeInput";
 import { DigitInput } from "./DigitInput";
+import { FormatNumberInput, formatString } from "./FormatNumberInput";
 
 type FormProps = {
   name: string;
@@ -10,6 +11,7 @@ type FormProps = {
   fruit: string;
   postalCode: string;
   number: string;
+  format: string;
 };
 
 const fruits = [{ name: "apple" }, { name: "pine" }, { name: "orange" }];
@@ -20,6 +22,7 @@ type SubmitState = {
   fruit: string;
   postalCode: string;
   number: string;
+  format: string;
 };
 
 const initialValues = {
@@ -28,6 +31,7 @@ const initialValues = {
   fruit: "",
   postalCode: "",
   number: "",
+  format: "",
 };
 
 const submitInitialState: SubmitState = initialValues;
@@ -49,6 +53,7 @@ type ForcusState = {
   fruit?: boolean;
   postalCode?: boolean;
   number?: boolean;
+  format?: boolean;
 };
 
 const validationSchema = (forcusState: ForcusState) => {
@@ -122,6 +127,43 @@ function App() {
             value={formik.values.number}
             onChange={(value: string) => {
               formik.setFieldValue("number", value);
+            }}
+          />
+          {/* <FormatNumberInput
+            type="tel"
+            value={formik.values.number}
+            placeholder="number"
+            name="number"
+            format={(value: string) => {
+              return formatString(value, "**** **** **** ****");
+            }}
+            maxLength={19}
+            onChange={(e) => {
+              const { value } = e.target;
+              formik.setFieldValue("number", value);
+            }}
+          /> */}
+          <span>{formik.touched.number && formik.errors.number}</span>
+        </div>
+        <div>
+          <FormatNumberInput
+            type="tel"
+            value={formik.values.format}
+            placeholder="format string"
+            name="format"
+            format={(value: string) => {
+              if (value[4] === "1") {
+                return formatString(value, "****-****-****-****");
+              }
+              if (value[4] === "2") {
+                return formatString(value, "**-******-****-****");
+              }
+              return formatString(value, "****************");
+            }}
+            maxLength={19}
+            onChange={(e) => {
+              const { value } = e.target;
+              formik.setFieldValue("format", value);
             }}
           />
           <span>{formik.touched.number && formik.errors.number}</span>
