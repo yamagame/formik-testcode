@@ -60,16 +60,18 @@ const pattern = (format: string | FormatProc, value: string) =>
 
 const delZenkaku = (str: string) => {
   let r = "";
+  let count = 0;
   let found = false;
   for (let i = str.length - 1; i >= 0; i--) {
     const isZenkaku = "０１２３４５６７８９".indexOf(str[i]) >= 0;
     if (found === true && isZenkaku) {
+      count++;
       continue;
     }
     if (isZenkaku) found = true;
     r = str[i] + r;
   }
-  return r;
+  return { inputValue: r, removedChar: count };
 };
 
 // const isIME = (ref: RefObject<boolean>) => {
@@ -118,7 +120,7 @@ export function FormatNumberInput(props: FormatInputProps) {
         const { selectionStart, selectionEnd, value } = e.target;
         // e.nativeEvent.stopPropagation();
         console.log("value", value);
-        let inputValue = delZenkaku(value);
+        const { inputValue, removedChar } = delZenkaku(value);
         // console.log("change", value);
         // if (isIME(whichRef)) {
         //   if (onChange) onChange(e);
@@ -134,8 +136,8 @@ export function FormatNumberInput(props: FormatInputProps) {
           selectionStart,
           formatPattern
         );
-        const start = Math.max(0, (selectionStart || 0) + delta);
-        const end = Math.max(0, (selectionEnd || 0) + delta);
+        const start = Math.max(0, (selectionStart || 0) + delta + removedChar);
+        const end = Math.max(0, (selectionEnd || 0) + delta + removedChar);
         setStart(start);
         setEnd(end);
         const omitSeparatorString = numberString(formatValue);
