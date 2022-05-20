@@ -1,4 +1,4 @@
-import React, { InputHTMLAttributes } from "react";
+import React, { InputHTMLAttributes, RefObject } from "react";
 
 const formatString = (value: string, format: string) => {
   const result: string[] = [];
@@ -25,9 +25,10 @@ type FormatInputProps = {
 function numberString(val: string) {
   const zenkaku = "０１２３４５６７８９".split("");
   const reg = new RegExp("(" + zenkaku.join("|") + ")", "g");
-  return val
+  const ret = val
     .replace(reg, (match) => String(zenkaku.indexOf(match)))
     .replace(/[^0-9]/g, "");
+  return ret;
 }
 
 function countSep(val: string, start?: number) {
@@ -57,12 +58,18 @@ function calcCaretPosition(
 const pattern = (format: string | FormatProc, value: string) =>
   typeof format === "string" ? format : format(numberString(value));
 
+// const isIME = (ref: RefObject<boolean>) => {
+//   // return ref.current === 229 || ref.current === 0;
+//   return ref.current;
+// };
+
 export function FormatNumberInput(props: FormatInputProps) {
   const { format, name, value, onChange, length, ...rest } = props;
   const [focus, setFocus] = React.useState(false);
   const [start, setStart] = React.useState(0);
   const [end, setEnd] = React.useState(0);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  // const whichRef = React.useRef<boolean>(false);
   React.useEffect(() => {
     if (inputRef && inputRef.current && focus) {
       inputRef.current.setSelectionRange(start, end);
@@ -75,8 +82,19 @@ export function FormatNumberInput(props: FormatInputProps) {
       {...rest}
       ref={inputRef}
       value={formatString(valueString, pattern(format, valueString))}
+      onKeyDown={(e) => {
+        // console.log(e.key, e.nativeEvent.isComposing);
+        // whichRef.current = e.nativeEvent.isComposing;
+        // whichRef.current = e.which;
+        // console.log(isIME(whichRef));
+      }}
       onChange={(e) => {
         const { selectionStart, selectionEnd, value } = e.target;
+        // console.log("change", value);
+        // if (isIME(whichRef)) {
+        //   if (onChange) onChange(e);
+        //   return;
+        // }
         let numStr = numberString(value);
         if (props.maxLength && numStr.length > maxLength && maxLength > 0)
           numStr = numStr.substring(0, maxLength);
@@ -90,12 +108,24 @@ export function FormatNumberInput(props: FormatInputProps) {
         const omitSeparatorString = numberString(formatValue);
         const newValueEvent = {
           ...e,
-          target: { ...e.target, value: omitSeparatorString },
+          target: { ...e.target, name: name || "", value: omitSeparatorString },
         };
-        onChange && onChange(newValueEvent);
+        if (onChange) onChange(newValueEvent);
       }}
-      onBlur={() => setFocus(false)}
+      onBlur={() => {
+        setFocus(false);
+      }}
       onFocus={() => setFocus(true)}
+      onCompositionStart={() => console.log("start")}
+      onCompositionUpdate={() => console.log("update")}
+      onCompositionEnd={() => {
+        if (inputRef.current)
+          inputRef.current.value = formatString(
+            valueString,
+            pattern(format, valueString)
+          );
+        console.log("end");
+      }}
     />
   );
 }
