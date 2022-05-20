@@ -77,6 +77,7 @@ export function FormatNumberInput(props: FormatInputProps) {
   });
   const maxLength = length || 0;
   const valueString = String(value || "");
+  console.log("valueString", valueString);
   return (
     <input
       {...rest}
@@ -90,7 +91,7 @@ export function FormatNumberInput(props: FormatInputProps) {
       }}
       onChange={(e) => {
         const { selectionStart, selectionEnd, value } = e.target;
-        console.log(value);
+        console.log("value", value);
         // console.log("change", value);
         // if (isIME(whichRef)) {
         //   if (onChange) onChange(e);
@@ -107,6 +108,7 @@ export function FormatNumberInput(props: FormatInputProps) {
         setStart(start);
         setEnd(end);
         const omitSeparatorString = numberString(formatValue);
+        console.log("omitSeparatorString", omitSeparatorString);
         const newValueEvent = {
           ...e,
           target: { ...e.target, name: name || "", value: omitSeparatorString },
