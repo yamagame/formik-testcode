@@ -84,6 +84,7 @@ export function FormatNumberInput(props: FormatInputProps) {
       ref={inputRef}
       value={formatString(valueString, pattern(format, valueString))}
       onKeyDown={(e) => {
+        console.log("onkey", e.key);
         // console.log(e.key, e.nativeEvent.isComposing);
         // whichRef.current = e.nativeEvent.isComposing;
         // whichRef.current = e.which;
@@ -91,6 +92,8 @@ export function FormatNumberInput(props: FormatInputProps) {
       }}
       onChange={(e) => {
         const { selectionStart, selectionEnd, value } = e.target;
+        e.nativeEvent.stopPropagation();
+        // console.log(e.nativeEvent.stopPropagation());
         console.log("value", value);
         // console.log("change", value);
         // if (isIME(whichRef)) {
@@ -125,13 +128,11 @@ export function FormatNumberInput(props: FormatInputProps) {
       }}
       onCompositionUpdate={() => {
         const s = formatString(valueString, pattern(format, valueString));
-        console.log(s);
         // if (inputRef.current) inputRef.current.value = s;
         console.log("update", s);
       }}
       onCompositionEnd={() => {
         const s = formatString(valueString, pattern(format, valueString));
-        console.log(s);
         // if (inputRef.current) inputRef.current.value = s;
         console.log("end", s);
       }}
