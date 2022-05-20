@@ -81,6 +81,7 @@ const isIME = (ref: RefObject<number>) => {
 
 export function FormatNumberInput(props: FormatInputProps) {
   const { format, name, value, onChange, length, ...rest } = props;
+  const [internalValue, setInternalValue] = React.useState(value);
   const [focus, setFocus] = React.useState(false);
   const [start, setStart] = React.useState(0);
   const [end, setEnd] = React.useState(0);
@@ -102,7 +103,7 @@ export function FormatNumberInput(props: FormatInputProps) {
       ref={inputRef}
       value={
         isIME(whichRef)
-          ? value
+          ? internalValue
           : formatString(valueString, pattern(format, valueString))
       }
       onKeyDown={(e) => {
@@ -121,7 +122,8 @@ export function FormatNumberInput(props: FormatInputProps) {
       }}
       onChange={(e) => {
         if (isIME(whichRef)) {
-          if (onChange) onChange(e);
+          setInternalValue(e.target.value);
+          // if (onChange) onChange(e);
           return;
         }
         if (!keyDownRef.current) {
@@ -188,7 +190,8 @@ export function FormatNumberInput(props: FormatInputProps) {
       onCompositionEnd={() => {
         const value = numberString(valueString);
         const s = formatString(value, pattern(format, value));
-        if (inputRef.current) inputRef.current.value = s;
+        setInternalValue(s);
+        // if (inputRef.current) inputRef.current.value = s;
         console.log("end", s);
         // setCopmositing(false);
       }}
