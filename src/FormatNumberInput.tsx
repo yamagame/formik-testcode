@@ -117,13 +117,14 @@ export function FormatNumberInput(props: FormatInputProps) {
       }}
       onFocus={() => setFocus(true)}
       onCompositionStart={() => console.log("start")}
-      onCompositionUpdate={() => console.log("update")}
+      onCompositionUpdate={() => {
+        const s = formatString(valueString, pattern(format, valueString));
+        if (inputRef.current) inputRef.current.value = s;
+        console.log("update");
+      }}
       onCompositionEnd={() => {
-        if (inputRef.current)
-          inputRef.current.value = formatString(
-            valueString,
-            pattern(format, valueString)
-          );
+        const s = formatString(valueString, pattern(format, valueString));
+        if (inputRef.current) inputRef.current.value = s;
         console.log("end");
       }}
     />
