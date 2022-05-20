@@ -124,7 +124,7 @@ export function FormatNumberInput(props: FormatInputProps) {
         if (isIME(whichRef)) {
           setInternalValue(e.target.value);
           // if (onChange) onChange(e);
-          return;
+          // return;
         }
         if (!keyDownRef.current) {
           if (inputRef.current) inputRef.current.setSelectionRange(start, end);
