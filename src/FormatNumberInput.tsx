@@ -119,11 +119,13 @@ export function FormatNumberInput(props: FormatInputProps) {
       onCompositionStart={() => console.log("start")}
       onCompositionUpdate={() => {
         const s = formatString(valueString, pattern(format, valueString));
+        console.log(s);
         if (inputRef.current) inputRef.current.value = s;
         console.log("update");
       }}
       onCompositionEnd={() => {
         const s = formatString(valueString, pattern(format, valueString));
+        console.log(s);
         if (inputRef.current) inputRef.current.value = s;
         console.log("end");
       }}
