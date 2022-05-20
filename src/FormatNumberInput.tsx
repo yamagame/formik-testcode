@@ -114,6 +114,7 @@ export function FormatNumberInput(props: FormatInputProps) {
       }}
       onChange={(e) => {
         if (!keyDownRef.current) return;
+        keyDownRef.current = false;
         const { selectionStart, selectionEnd, value } = e.target;
         // e.nativeEvent.stopPropagation();
         console.log("value", value);
