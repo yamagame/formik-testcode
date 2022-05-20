@@ -87,7 +87,7 @@ export function FormatNumberInput(props: FormatInputProps) {
   const [end, setEnd] = React.useState(0);
   // const [compositing, setCopmositing] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const keyDownRef = React.useRef<boolean>(false);
+  // const keyDownRef = React.useRef<boolean>(false);
   const whichRef = React.useRef<number>(-1);
   React.useEffect(() => {
     if (inputRef && inputRef.current && focus && !isIME(whichRef)) {
@@ -114,11 +114,11 @@ export function FormatNumberInput(props: FormatInputProps) {
         // whichRef.current = e.nativeEvent.isComposing;
         // whichRef.current = e.which;
         // console.log(isIME(whichRef));
-        keyDownRef.current = true;
+        // keyDownRef.current = true;
       }}
       onKeyUp={(e) => {
         console.log("onup", e.key);
-        keyDownRef.current = false;
+        // keyDownRef.current = false;
       }}
       onChange={(e) => {
         if (isIME(whichRef)) {
@@ -126,12 +126,12 @@ export function FormatNumberInput(props: FormatInputProps) {
           // if (onChange) onChange(e);
           // return;
         }
-        if (!keyDownRef.current) {
-          if (inputRef.current) inputRef.current.setSelectionRange(start, end);
-          return;
-        }
+        // if (!keyDownRef.current) {
+        //   if (inputRef.current) inputRef.current.setSelectionRange(start, end);
+        //   return;
+        // }
+        // keyDownRef.current = false;
         {
-          keyDownRef.current = false;
           const { selectionStart, selectionEnd, value } = e.target;
           // e.nativeEvent.stopPropagation();
           // console.log("value", value);
@@ -175,6 +175,9 @@ export function FormatNumberInput(props: FormatInputProps) {
       }}
       onBlur={() => {
         setFocus(false);
+        const value = numberString(valueString);
+        const s = formatString(value, pattern(format, value));
+        setInternalValue(s);
       }}
       onFocus={() => setFocus(true)}
       onCompositionStart={() => {
