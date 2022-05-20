@@ -90,6 +90,7 @@ export function FormatNumberInput(props: FormatInputProps) {
       }}
       onChange={(e) => {
         const { selectionStart, selectionEnd, value } = e.target;
+        console.log(value);
         // console.log("change", value);
         // if (isIME(whichRef)) {
         //   if (onChange) onChange(e);
