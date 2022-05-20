@@ -74,21 +74,22 @@ const delZenkaku = (str: string) => {
   return { inputValue: r, removedChar: count };
 };
 
-// const isIME = (ref: RefObject<boolean>) => {
-//   // return ref.current === 229 || ref.current === 0;
-//   return ref.current;
-// };
+const isIME = (ref: RefObject<number>) => {
+  return ref.current === 229 || ref.current === 0;
+  // return ref.current;
+};
 
 export function FormatNumberInput(props: FormatInputProps) {
   const { format, name, value, onChange, length, ...rest } = props;
   const [focus, setFocus] = React.useState(false);
   const [start, setStart] = React.useState(0);
   const [end, setEnd] = React.useState(0);
+  // const [compositing, setCopmositing] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const keyDownRef = React.useRef<boolean>(false);
-  // const whichRef = React.useRef<boolean>(false);
+  const whichRef = React.useRef<number>(-1);
   React.useEffect(() => {
-    if (inputRef && inputRef.current && focus) {
+    if (inputRef && inputRef.current && focus && !isIME(whichRef)) {
       inputRef.current.setSelectionRange(start, end);
     }
   });
@@ -99,12 +100,16 @@ export function FormatNumberInput(props: FormatInputProps) {
     <input
       {...rest}
       ref={inputRef}
-      value={formatString(valueString, pattern(format, valueString))}
+      value={
+        isIME(whichRef)
+          ? value
+          : formatString(valueString, pattern(format, valueString))
+      }
       onKeyDown={(e) => {
         console.log("onkey", e.key);
         console.log("isComposing", e.nativeEvent.isComposing);
         console.log("which", e.which);
-        // whichRef.current = e.which;
+        whichRef.current = e.which;
         // whichRef.current = e.nativeEvent.isComposing;
         // whichRef.current = e.which;
         // console.log(isIME(whichRef));
@@ -115,6 +120,10 @@ export function FormatNumberInput(props: FormatInputProps) {
         keyDownRef.current = false;
       }}
       onChange={(e) => {
+        if (isIME(whichRef)) {
+          if (onChange) onChange(e);
+          return;
+        }
         if (!keyDownRef.current) {
           if (inputRef.current) inputRef.current.setSelectionRange(start, end);
           return;
@@ -123,8 +132,10 @@ export function FormatNumberInput(props: FormatInputProps) {
           keyDownRef.current = false;
           const { selectionStart, selectionEnd, value } = e.target;
           // e.nativeEvent.stopPropagation();
-          console.log("value", value);
-          const { inputValue, removedChar } = delZenkaku(value);
+          // console.log("value", value);
+          // const { inputValue, removedChar } = delZenkaku(value);
+          const removedChar = 0;
+          const inputValue = value;
           // console.log("change", value);
           // if (isIME(whichRef)) {
           //   if (onChange) onChange(e);
@@ -167,6 +178,7 @@ export function FormatNumberInput(props: FormatInputProps) {
       onCompositionStart={() => {
         const s = formatString(valueString, pattern(format, valueString));
         console.log("start", s);
+        // setCopmositing(true);
       }}
       onCompositionUpdate={() => {
         const s = formatString(valueString, pattern(format, valueString));
@@ -174,9 +186,11 @@ export function FormatNumberInput(props: FormatInputProps) {
         console.log("update", s);
       }}
       onCompositionEnd={() => {
-        const s = formatString(valueString, pattern(format, valueString));
-        // if (inputRef.current) inputRef.current.value = s;
+        const value = numberString(valueString);
+        const s = formatString(value, pattern(format, value));
+        if (inputRef.current) inputRef.current.value = s;
         console.log("end", s);
+        // setCopmositing(false);
       }}
     />
   );
