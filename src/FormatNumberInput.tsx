@@ -58,6 +58,20 @@ function calcCaretPosition(
 const pattern = (format: string | FormatProc, value: string) =>
   typeof format === "string" ? format : format(numberString(value));
 
+const delZenkaku = (str: string) => {
+  let r = "";
+  let found = false;
+  for (let i = str.length - 1; i >= 0; i--) {
+    const isZenkaku = "０１２３４５６７８９".indexOf(str[i]) >= 0;
+    if (found === true && isZenkaku) {
+      continue;
+    }
+    if (isZenkaku) found = true;
+    r = str[i] + r;
+  }
+  return r;
+};
+
 // const isIME = (ref: RefObject<boolean>) => {
 //   // return ref.current === 229 || ref.current === 0;
 //   return ref.current;
@@ -99,21 +113,26 @@ export function FormatNumberInput(props: FormatInputProps) {
         keyDownRef.current = false;
       }}
       onChange={(e) => {
-        // if (!keyDownRef.current) return;
+        if (!keyDownRef.current) return;
         const { selectionStart, selectionEnd, value } = e.target;
         // e.nativeEvent.stopPropagation();
         console.log("value", value);
+        let inputValue = delZenkaku(value);
         // console.log("change", value);
         // if (isIME(whichRef)) {
         //   if (onChange) onChange(e);
         //   return;
         // }
-        let numStr = numberString(value);
+        let numStr = numberString(inputValue);
         if (props.maxLength && numStr.length > maxLength && maxLength > 0)
           numStr = numStr.substring(0, maxLength);
-        const formatPattern = pattern(format, value);
+        const formatPattern = pattern(format, inputValue);
         const formatValue = formatString(numStr, formatPattern);
-        const delta = calcCaretPosition(value, selectionStart, formatPattern);
+        const delta = calcCaretPosition(
+          inputValue,
+          selectionStart,
+          formatPattern
+        );
         const start = Math.max(0, (selectionStart || 0) + delta);
         const end = Math.max(0, (selectionEnd || 0) + delta);
         setStart(start);
