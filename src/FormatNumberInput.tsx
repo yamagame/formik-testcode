@@ -69,6 +69,7 @@ export function FormatNumberInput(props: FormatInputProps) {
   const [start, setStart] = React.useState(0);
   const [end, setEnd] = React.useState(0);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const keyDownRef = React.useRef<boolean>(false);
   // const whichRef = React.useRef<boolean>(false);
   React.useEffect(() => {
     if (inputRef && inputRef.current && focus) {
@@ -91,14 +92,16 @@ export function FormatNumberInput(props: FormatInputProps) {
         // whichRef.current = e.nativeEvent.isComposing;
         // whichRef.current = e.which;
         // console.log(isIME(whichRef));
+        keyDownRef.current = true;
       }}
       onKeyUp={(e) => {
         console.log("onup", e.key);
+        keyDownRef.current = false;
       }}
       onChange={(e) => {
+        // if (!keyDownRef.current) return;
         const { selectionStart, selectionEnd, value } = e.target;
-        e.nativeEvent.stopPropagation();
-        // console.log(e.nativeEvent.stopPropagation());
+        // e.nativeEvent.stopPropagation();
         console.log("value", value);
         // console.log("change", value);
         // if (isIME(whichRef)) {
