@@ -85,10 +85,15 @@ export function FormatNumberInput(props: FormatInputProps) {
       value={formatString(valueString, pattern(format, valueString))}
       onKeyDown={(e) => {
         console.log("onkey", e.key);
-        // console.log(e.key, e.nativeEvent.isComposing);
+        console.log("isComposing", e.nativeEvent.isComposing);
+        console.log("which", e.which);
+        // whichRef.current = e.which;
         // whichRef.current = e.nativeEvent.isComposing;
         // whichRef.current = e.which;
         // console.log(isIME(whichRef));
+      }}
+      onKeyUp={(e) => {
+        console.log("onup", e.key);
       }}
       onChange={(e) => {
         const { selectionStart, selectionEnd, value } = e.target;
