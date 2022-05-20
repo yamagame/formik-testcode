@@ -115,38 +115,50 @@ export function FormatNumberInput(props: FormatInputProps) {
         keyDownRef.current = false;
       }}
       onChange={(e) => {
-        if (!keyDownRef.current) return;
-        keyDownRef.current = false;
-        const { selectionStart, selectionEnd, value } = e.target;
-        // e.nativeEvent.stopPropagation();
-        console.log("value", value);
-        const { inputValue, removedChar } = delZenkaku(value);
-        // console.log("change", value);
-        // if (isIME(whichRef)) {
-        //   if (onChange) onChange(e);
-        //   return;
-        // }
-        let numStr = numberString(inputValue);
-        if (props.maxLength && numStr.length > maxLength && maxLength > 0)
-          numStr = numStr.substring(0, maxLength);
-        const formatPattern = pattern(format, inputValue);
-        const formatValue = formatString(numStr, formatPattern);
-        const delta = calcCaretPosition(
-          inputValue,
-          selectionStart,
-          formatPattern
-        );
-        const start = Math.max(0, (selectionStart || 0) + delta + removedChar);
-        const end = Math.max(0, (selectionEnd || 0) + delta + removedChar);
-        setStart(start);
-        setEnd(end);
-        const omitSeparatorString = numberString(formatValue);
-        console.log("omitSeparatorString", omitSeparatorString);
-        const newValueEvent = {
-          ...e,
-          target: { ...e.target, name: name || "", value: omitSeparatorString },
-        };
-        if (onChange) onChange(newValueEvent);
+        if (!keyDownRef.current) {
+          if (inputRef.current) inputRef.current.setSelectionRange(start, end);
+          return;
+        }
+        {
+          keyDownRef.current = false;
+          const { selectionStart, selectionEnd, value } = e.target;
+          // e.nativeEvent.stopPropagation();
+          console.log("value", value);
+          const { inputValue, removedChar } = delZenkaku(value);
+          // console.log("change", value);
+          // if (isIME(whichRef)) {
+          //   if (onChange) onChange(e);
+          //   return;
+          // }
+          let numStr = numberString(inputValue);
+          if (props.maxLength && numStr.length > maxLength && maxLength > 0)
+            numStr = numStr.substring(0, maxLength);
+          const formatPattern = pattern(format, inputValue);
+          const formatValue = formatString(numStr, formatPattern);
+          const delta = calcCaretPosition(
+            inputValue,
+            selectionStart,
+            formatPattern
+          );
+          const start = Math.max(
+            0,
+            (selectionStart || 0) + delta - removedChar
+          );
+          const end = Math.max(0, (selectionEnd || 0) + delta - removedChar);
+          setStart(start);
+          setEnd(end);
+          const omitSeparatorString = numberString(formatValue);
+          console.log("omitSeparatorString", omitSeparatorString);
+          const newValueEvent = {
+            ...e,
+            target: {
+              ...e.target,
+              name: name || "",
+              value: omitSeparatorString,
+            },
+          };
+          if (onChange) onChange(newValueEvent);
+        }
       }}
       onBlur={() => {
         setFocus(false);
