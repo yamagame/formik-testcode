@@ -1,5 +1,5 @@
 import React, { InputHTMLAttributes } from "react";
-// import { TextField } from "./TextField";
+import { TextField } from "./TextField";
 
 const formatString = (value: string, format: string) => {
   const result: string[] = [];
@@ -62,6 +62,10 @@ function calcCaretPosition(
 const pattern = (format: string | FormatProc, value: string) =>
   typeof format === "string" ? format : format(numberString(value));
 
+const findInput = (inputRef: HTMLInputElement) => {
+  return inputRef.querySelector("input");
+};
+
 export function FormatNumberInput(props: FormatInputProps) {
   const { format, name, value, onChangeValue, length, ...rest } = props;
   const [internalValue, setInternalValue] = React.useState(String(value));
@@ -72,87 +76,88 @@ export function FormatNumberInput(props: FormatInputProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
     if (inputRef && inputRef.current && focus && !compositingRef.current) {
-      inputRef.current.setSelectionRange(start, end);
+      findInput(inputRef.current)?.setSelectionRange(start, end);
     }
   });
   const maxLength = length || 0;
   return (
-    <input
-      {...rest}
-      ref={inputRef}
-      value={internalValue}
-      onChange={(e) => {
-        const { selectionStart, selectionEnd, value } = e.target;
-        if (!inputRef.current) return;
-        if (compositingRef.current) {
-          setInternalValue(e.target.value);
-          const start = Math.max(0, selectionStart || 0);
-          const end = Math.max(0, selectionEnd || 0);
-          setStart(start);
-          setEnd(end);
-          if (onChangeValue)
-            onChangeValue({
-              name: name || "",
-              value: e.target.value,
-            });
-          return;
-        }
-        const inputValue = value;
-        let numStr = numberString(inputValue);
-        if (props.maxLength && numStr.length > maxLength && maxLength > 0)
-          numStr = numStr.substring(0, maxLength);
-        const formatPattern = pattern(format, inputValue);
-        const formatedValue = formatString(numStr, formatPattern);
-        const delta = calcCaretPosition(
-          inputValue,
-          selectionStart,
-          formatPattern
-        );
-        const numberedValue = numberString(formatedValue, props.length);
-        const nextStart = Math.max(0, (selectionStart || 0) + delta);
-        const nextEnd = Math.max(0, (selectionEnd || 0) + delta);
-        setStart(nextStart);
-        setEnd(nextEnd);
-        setInternalValue(formatedValue);
-        const newValueEvent = {
-          name: name || "",
-          value: numberedValue,
-        };
-        inputRef.current.setSelectionRange(start, end);
-        if (onChangeValue) onChangeValue(newValueEvent);
-      }}
-      onBlur={() => {
-        setFocus(false);
-        const value = numberString(internalValue, props.length);
-        const formatedValue = formatString(value, pattern(format, value));
-        setInternalValue(formatedValue);
-        const newValueEvent = {
-          name: name || "",
-          value,
-        };
-        if (onChangeValue) onChangeValue(newValueEvent);
-      }}
-      onFocus={() => setFocus(true)}
-      onCompositionStart={() => {
-        compositingRef.current = true;
-      }}
-      onCompositionEnd={() => {
-        compositingRef.current = false;
-        const value = numberString(internalValue, props.length);
-        const formatedValue = formatString(value, pattern(format, value));
-        setInternalValue(formatedValue);
-        const formatPattern = pattern(format, internalValue);
-        const delta = calcCaretPosition(internalValue, start, formatPattern);
-        const nextStart = Math.max(0, (start || 0) + delta);
-        const nextEnd = Math.max(0, (end || 0) + delta);
-        setStart(nextStart);
-        setEnd(nextEnd);
-        const newValueEvent = {
-          name: name || "",
-          value,
-        };
-        if (onChangeValue) onChangeValue(newValueEvent);
-      }}
-    />
+    <div ref={inputRef}>
+      <TextField
+        {...rest}
+        value={internalValue}
+        onChange={(e) => {
+          const { selectionStart, selectionEnd, value } = e.target;
+          if (!inputRef.current) return;
+          if (compositingRef.current) {
+            setInternalValue(e.target.value);
+            const start = Math.max(0, selectionStart || 0);
+            const end = Math.max(0, selectionEnd || 0);
+            setStart(start);
+            setEnd(end);
+            if (onChangeValue)
+              onChangeValue({
+                name: name || "",
+                value: e.target.value,
+              });
+            return;
+          }
+          const inputValue = value;
+          let numStr = numberString(inputValue);
+          if (props.maxLength && numStr.length > maxLength && maxLength > 0)
+            numStr = numStr.substring(0, maxLength);
+          const formatPattern = pattern(format, inputValue);
+          const formatedValue = formatString(numStr, formatPattern);
+          const delta = calcCaretPosition(
+            inputValue,
+            selectionStart,
+            formatPattern
+          );
+          const numberedValue = numberString(formatedValue, props.length);
+          const nextStart = Math.max(0, (selectionStart || 0) + delta);
+          const nextEnd = Math.max(0, (selectionEnd || 0) + delta);
+          setStart(nextStart);
+          setEnd(nextEnd);
+          setInternalValue(formatedValue);
+          const newValueEvent = {
+            name: name || "",
+            value: numberedValue,
+          };
+          findInput(inputRef.current)?.setSelectionRange(start, end);
+          if (onChangeValue) onChangeValue(newValueEvent);
+        }}
+        onBlur={() => {
+          setFocus(false);
+          const value = numberString(internalValue, props.length);
+          const formatedValue = formatString(value, pattern(format, value));
+          setInternalValue(formatedValue);
+          const newValueEvent = {
+            name: name || "",
+            value,
+          };
+          if (onChangeValue) onChangeValue(newValueEvent);
+        }}
+        onFocus={() => setFocus(true)}
+        onCompositionStart={() => {
+          compositingRef.current = true;
+        }}
+        onCompositionEnd={() => {
+          compositingRef.current = false;
+          const value = numberString(internalValue, props.length);
+          const formatedValue = formatString(value, pattern(format, value));
+          setInternalValue(formatedValue);
+          const formatPattern = pattern(format, internalValue);
+          const delta = calcCaretPosition(internalValue, start, formatPattern);
+          const nextStart = Math.max(0, (start || 0) + delta);
+          const nextEnd = Math.max(0, (end || 0) + delta);
+          setStart(nextStart);
+          setEnd(nextEnd);
+          const newValueEvent = {
+            name: name || "",
+            value,
+          };
+          if (onChangeValue) onChangeValue(newValueEvent);
+        }}
+      />
+    </div>
   );
 }
