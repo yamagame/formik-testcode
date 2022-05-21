@@ -145,8 +145,8 @@ export function FormatNumberInput(props: FormatInputProps) {
   });
   const maxLength = length || 0;
   const valueString = String(value);
-  console.log(` externalValue ${valueString}`);
-  console.log(`internalValue ${internalValue}`);
+  // console.log(` externalValue ${valueString}`);
+  // console.log(`internalValue ${internalValue}`);
   return (
     <input
       {...rest}

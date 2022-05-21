@@ -148,7 +148,14 @@ function App() {
             value={formik.values.input}
             maxLength={16}
             autoComplete="off"
-            onChange={formik.handleChange}
+            onKeyDown={(e) => {
+              console.log(e.keyCode);
+              console.log(e.key);
+            }}
+            onChange={(e) => {
+              console.log(e.target.value);
+              formik.handleChange(e);
+            }}
             onBlur={(e) => {
               formik.handleBlur(e);
               formik.setFieldValue(
