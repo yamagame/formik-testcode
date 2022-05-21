@@ -1,4 +1,4 @@
-import { FormatNumberInput } from "./FormatNumberInput";
+import { FormatNumberInput } from "../FormatNumberInput";
 
 type DateInputProps = {
   name: string;

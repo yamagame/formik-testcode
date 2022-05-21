@@ -1,5 +1,12 @@
 import React, { InputHTMLAttributes } from "react";
-import { TextField } from "./TextField";
+
+function TextField(props: InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <div>
+      <input {...props} />
+    </div>
+  );
+}
 
 const formatString = (value: string, format: string) => {
   const result: string[] = [];
