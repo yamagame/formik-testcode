@@ -2,7 +2,7 @@ import React, { InputHTMLAttributes } from "react";
 
 function TextField(props: InputHTMLAttributes<HTMLInputElement>) {
   return (
-    <div>
+    <div style={{ display: "inline" }}>
       <input {...props} />
     </div>
   );
@@ -88,7 +88,7 @@ export function FormatNumberInput(props: FormatInputProps) {
   });
   const maxLength = length || 0;
   return (
-    <div ref={inputRef}>
+    <div ref={inputRef} style={{ display: "inline" }}>
       <TextField
         {...rest}
         value={internalValue}
