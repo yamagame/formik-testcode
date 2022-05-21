@@ -1,24 +1,24 @@
 import { FormatNumberInput } from "./FormatNumberInput";
 
-type DigitInputProps = {
+type PostalCodeInputProps = {
   name: string;
+  placeholder: string;
   value: string;
   onChange: (value: string) => void;
 };
 
-export function DigitInput(props: DigitInputProps) {
+export function PostalCodeInput(props: PostalCodeInputProps) {
   return (
     <FormatNumberInput
       type="tel"
       value={props.value}
-      placeholder={props.name}
+      placeholder={props.placeholder}
       name={props.name}
-      autoComplete="off"
-      format="**** **** **** ****"
-      maxLength={19}
-      length={16}
-      onChange={(e) => {
-        const { value } = e.target;
+      format="***-****"
+      maxLength={8}
+      length={7}
+      onChangeValue={(e) => {
+        const { value } = e;
         props.onChange(value);
       }}
     />

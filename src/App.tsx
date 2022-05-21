@@ -1,40 +1,38 @@
 import React from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { PostalCodeInput } from "./PostalCodeInput";
-import { DigitInput } from "./DigitInput";
-import { FormatNumberInput } from "./FormatNumberInput";
+import { PostalCodeInput } from "./components/PostalCodeInput";
+import { DigitInput } from "./components/DigitInput";
+import { DateInput } from "./components/DateInput";
+import { TextField } from "./components/TextField";
 
 type FormProps = {
-  name: string;
-  input: string;
-  star: number;
-  fruit: string;
   postalCode: string;
-  number: string;
-  number2: string;
+  date: string;
+  digit: string;
+  text: string;
+  name: string;
+  fruit: string;
 };
 
 const fruits = [{ name: "apple" }, { name: "pine" }, { name: "orange" }];
 
 type SubmitState = {
-  name: string;
-  input: string;
-  star: number;
-  fruit: string;
   postalCode: string;
-  number: string;
-  number2: string;
+  date: string;
+  digit: string;
+  text: string;
+  name: string;
+  fruit: string;
 };
 
 const initialValues = {
-  name: "",
-  input: "",
-  star: 0,
-  fruit: "",
   postalCode: "",
-  number: "",
-  number2: "",
+  date: "",
+  digit: "",
+  text: "",
+  name: "",
+  fruit: "",
 };
 
 const submitInitialState: SubmitState = initialValues;
@@ -51,46 +49,41 @@ function submitReducer(state: SubmitState, action: SubmitAction) {
 }
 
 type ForcusState = {
-  name?: boolean;
-  star?: boolean;
-  fruit?: boolean;
   postalCode?: boolean;
-  number?: boolean;
-  number2?: boolean;
+  date?: boolean;
+  digit?: boolean;
+  text?: boolean;
+  name?: boolean;
+  fruit?: boolean;
 };
 
 const validationSchema = (forcusState: ForcusState) => {
   return yup.object().shape({
-    // name: yup.lazy((name) => {
-    //   if (forcusState.name) {
-    //     return yup
-    //       .string()
-    //       .matches(/^[a-zA-Z]*$/)
-    //       .required();
-    //   }
-    //   return yup
-    //     .string()
-    //     .matches(/^[A-Z]*$/)
-    //     .required();
-    // }),
-    // star: yup.number().required().positive().integer(),
-    // fruit: yup.string().required(),
-    // postalCode: yup
-    //   .string()
-    //   .matches(/^[0-9]{3}[0-9]{4}$/)
-    //   .required(),
-    number: yup
+    postalCode: yup
+      .string()
+      .matches(/^[0-9]{3}[0-9]{4}$/)
+      .required(),
+    date: yup
+      .string()
+      .matches(/^[0-9]{4}[0-9]{2}[0-9]{2}$/)
+      .required(),
+    digit: yup
       .string()
       .matches(/^[0-9]{4}[0-9]{4}[0-9]{4}[0-9]{4}$/)
       .required(),
-    input: yup
-      .string()
-      .matches(/^[0-9]{4}[0-9]{4}[0-9]{4}[0-9]{4}$/)
-      .required(),
-    // number2: yup
-    //   .string()
-    //   .matches(/^[0-9]{4}[0-9]{4}[0-9]{4}[0-9]{4}$/)
-    //   .required(),
+    name: yup.lazy((name) => {
+      if (forcusState.name) {
+        return yup
+          .string()
+          .matches(/^[a-zA-Z]*$/)
+          .required();
+      }
+      return yup
+        .string()
+        .matches(/^[A-Z]*$/)
+        .required();
+    }),
+    fruit: yup.string().required(),
   });
 };
 
@@ -132,49 +125,9 @@ function App() {
         }}
       >
         <div>
-          <DigitInput
-            name="number"
-            value={formik.values.number}
-            onChange={(value: string) => {
-              formik.setFieldValue("number", value);
-            }}
-          />
-          <span>{formik.touched.number && formik.errors.number}</span>
-        </div>
-        <div>
-          <input
-            name="input"
-            placeholder="input"
-            value={formik.values.input}
-            maxLength={16}
-            autoComplete="off"
-            onKeyDown={(e) => {
-              console.log("key", e.key);
-            }}
-            onChange={(e) => {
-              console.log("change", e.target.value);
-              formik.handleChange(e);
-            }}
-            onBlur={(e) => {
-              formik.handleBlur(e);
-              formik.setFieldValue(
-                e.target.name,
-                numberString(e.target.value),
-                true
-              );
-            }}
-            onCompositionStart={() => {
-              console.log("composition-start");
-            }}
-            onCompositionEnd={() => {
-              console.log("composition-end");
-            }}
-          />
-          <span>{formik.touched.input && formik.errors.input}</span>
-        </div>
-        {/* <div>
           <PostalCodeInput
             name="postalCode"
+            placeholder="postal-code"
             value={formik.values.postalCode}
             onChange={(value: string) => {
               formik.setFieldValue("postalCode", value);
@@ -183,47 +136,32 @@ function App() {
           <span>{formik.touched.postalCode && formik.errors.postalCode}</span>
         </div>
         <div>
-          <DigitInput
-            name="number"
-            value={formik.values.number}
+          <DateInput
+            name="date"
+            placeholder="date"
+            value={formik.values.date}
             onChange={(value: string) => {
-              formik.setFieldValue("number", value);
+              formik.setFieldValue("date", value);
             }}
           />
-          <span>{formik.touched.number && formik.errors.number}</span>
+          <span>{formik.touched.date && formik.errors.date}</span>
         </div>
         <div>
-          <FormatNumberInput
-            type="tel"
-            value={formik.values.number2}
-            placeholder="number2 string"
-            name="number2"
-            format={(value: string) => {
-              if (value[2] === "1") {
-                return "**---******---****---****";
-              }
-              if (value[8] === "3") {
-                return "****-****-****-****";
-              }
-              if (value[8] === "2") {
-                return "**-******-****-****";
-              }
-              return "****:****:****:****";
-            }}
-            maxLength={25}
-            length={16}
-            onChange={(e) => {
-              const { value } = e.target;
-              formik.setFieldValue("number2", value);
+          <DigitInput
+            name="digit"
+            value={formik.values.digit}
+            onChange={(value: string) => {
+              formik.setFieldValue("digit", value);
             }}
           />
-          <span>{formik.touched.number2 && formik.errors.number2}</span>
+          <span>{formik.touched.digit && formik.errors.digit}</span>
         </div>
         <div>
           <input
             type="text"
             placeholder="name"
             name="name"
+            autoComplete="off"
             value={formik.values.name}
             onChange={(e) => {
               formik.handleChange(e);
@@ -239,18 +177,29 @@ function App() {
           <span>{formik.touched.name && formik.errors.name}</span>
         </div>
         <div>
-          <input
-            type="text"
-            placeholder="star"
-            value={formik.values.star}
-            name="star"
-            onChange={formik.handleChange}
+          <TextField
+            name="text"
+            placeholder="text"
+            value={formik.values.text}
+            maxLength={16}
+            autoComplete="off"
+            onChange={(e) => {
+              formik.handleChange(e);
+            }}
+            onBlur={(e) => {
+              formik.handleBlur(e);
+              formik.setFieldValue(
+                e.target.name,
+                numberString(e.target.value),
+                true
+              );
+            }}
           />
-          <span>{formik.touched.star && formik.errors.star}</span>
+          <span>{formik.touched.text && formik.errors.text}</span>
         </div>
         <div>
           <select name="fruit" onChange={formik.handleChange}>
-            <option value="" label="Select a Fruit" />
+            <option value="" label="Select a favorite Fruit" />
             {fruits.map((fruit) => (
               <option key={fruit.name} value={fruit.name}>
                 {fruit.name}
@@ -258,7 +207,7 @@ function App() {
             ))}
           </select>
           <span>{formik.touched.fruit && formik.errors.fruit}</span>
-        </div> */}
+        </div>
         <div>
           <input
             type="submit"
@@ -270,34 +219,30 @@ function App() {
         </div>
       </form>
       <div style={{ marginTop: 30 }}>
-        {/* <div>
-          <span>postalCode: </span>
+        <div>
+          <span>postal code: </span>
           <span>{state.postalCode}</span>
-        </div> */}
-        <div>
-          <span>number: </span>
-          <span>{state.number}</span>
         </div>
         <div>
-          <span>input: </span>
-          <span>{state.input}</span>
+          <span>date: </span>
+          <span>{state.date}</span>
         </div>
-        {/* <div>
-          <span>number2: </span>
-          <span>{state.number2}</span>
+        <div>
+          <span>digit: </span>
+          <span>{state.digit}</span>
         </div>
         <div>
           <span>name: </span>
           <span>{state.name}</span>
         </div>
         <div>
-          <span>star: </span>
-          <span>{state.star}</span>
+          <span>text: </span>
+          <span>{state.text}</span>
         </div>
         <div>
           <span>fruit: </span>
           <span>{state.fruit}</span>
-        </div> */}
+        </div>
       </div>
     </div>
   );
