@@ -163,6 +163,12 @@ function App() {
                 true
               );
             }}
+            onCompositionStart={() => {
+              console.log("composition-start");
+            }}
+            onCompositionEnd={() => {
+              console.log("composition-end");
+            }}
           />
           <span>{formik.touched.input && formik.errors.input}</span>
         </div>
