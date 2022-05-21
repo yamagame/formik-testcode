@@ -13,6 +13,7 @@ export function DigitInput(props: DigitInputProps) {
       value={props.value}
       placeholder={props.name}
       name={props.name}
+      autoComplete="off"
       format="**** **** **** ****"
       maxLength={19}
       length={16}

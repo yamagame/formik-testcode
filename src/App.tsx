@@ -7,6 +7,7 @@ import { FormatNumberInput } from "./FormatNumberInput";
 
 type FormProps = {
   name: string;
+  input: string;
   star: number;
   fruit: string;
   postalCode: string;
@@ -18,6 +19,7 @@ const fruits = [{ name: "apple" }, { name: "pine" }, { name: "orange" }];
 
 type SubmitState = {
   name: string;
+  input: string;
   star: number;
   fruit: string;
   postalCode: string;
@@ -27,6 +29,7 @@ type SubmitState = {
 
 const initialValues = {
   name: "",
+  input: "",
   star: 0,
   fruit: "",
   postalCode: "",
@@ -80,12 +83,25 @@ const validationSchema = (forcusState: ForcusState) => {
       .string()
       .matches(/^[0-9]{4}[0-9]{4}[0-9]{4}[0-9]{4}$/)
       .required(),
+    input: yup
+      .string()
+      .matches(/^[0-9]{4}[0-9]{4}[0-9]{4}[0-9]{4}$/)
+      .required(),
     // number2: yup
     //   .string()
     //   .matches(/^[0-9]{4}[0-9]{4}[0-9]{4}[0-9]{4}$/)
     //   .required(),
   });
 };
+
+function numberString(val: string) {
+  const zenkaku = "０１２３４５６７８９".split("");
+  const reg = new RegExp("(" + zenkaku.join("|") + ")", "g");
+  const ret = val
+    .replace(reg, (match) => String(zenkaku.indexOf(match)))
+    .replace(/[^0-9]/g, "");
+  return ret;
+}
 
 function App() {
   const [state, dispatch] = React.useReducer(submitReducer, submitInitialState);
@@ -124,6 +140,25 @@ function App() {
             }}
           />
           <span>{formik.touched.number && formik.errors.number}</span>
+        </div>
+        <div>
+          <input
+            name="input"
+            placeholder="input"
+            value={formik.values.input}
+            maxLength={16}
+            autoComplete="off"
+            onChange={formik.handleChange}
+            onBlur={(e) => {
+              formik.handleBlur(e);
+              formik.setFieldValue(
+                e.target.name,
+                numberString(e.target.value),
+                true
+              );
+            }}
+          />
+          <span>{formik.touched.input && formik.errors.input}</span>
         </div>
         {/* <div>
           <PostalCodeInput
@@ -230,6 +265,10 @@ function App() {
         <div>
           <span>number: </span>
           <span>{state.number}</span>
+        </div>
+        <div>
+          <span>input: </span>
+          <span>{state.input}</span>
         </div>
         {/* <div>
           <span>number2: </span>
