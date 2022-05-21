@@ -58,32 +58,32 @@ type ForcusState = {
 
 const validationSchema = (forcusState: ForcusState) => {
   return yup.object().shape({
-    name: yup.lazy((name) => {
-      if (forcusState.name) {
-        return yup
-          .string()
-          .matches(/^[a-zA-Z]*$/)
-          .required();
-      }
-      return yup
-        .string()
-        .matches(/^[A-Z]*$/)
-        .required();
-    }),
-    star: yup.number().required().positive().integer(),
-    fruit: yup.string().required(),
-    postalCode: yup
-      .string()
-      .matches(/^[0-9]{3}[0-9]{4}$/)
-      .required(),
+    // name: yup.lazy((name) => {
+    //   if (forcusState.name) {
+    //     return yup
+    //       .string()
+    //       .matches(/^[a-zA-Z]*$/)
+    //       .required();
+    //   }
+    //   return yup
+    //     .string()
+    //     .matches(/^[A-Z]*$/)
+    //     .required();
+    // }),
+    // star: yup.number().required().positive().integer(),
+    // fruit: yup.string().required(),
+    // postalCode: yup
+    //   .string()
+    //   .matches(/^[0-9]{3}[0-9]{4}$/)
+    //   .required(),
     number: yup
       .string()
       .matches(/^[0-9]{4}[0-9]{4}[0-9]{4}[0-9]{4}$/)
       .required(),
-    number2: yup
-      .string()
-      .matches(/^[0-9]{4}[0-9]{4}[0-9]{4}[0-9]{4}$/)
-      .required(),
+    // number2: yup
+    //   .string()
+    //   .matches(/^[0-9]{4}[0-9]{4}[0-9]{4}[0-9]{4}$/)
+    //   .required(),
   });
 };
 
@@ -116,6 +116,16 @@ function App() {
         }}
       >
         <div>
+          <DigitInput
+            name="number"
+            value={formik.values.number}
+            onChange={(value: string) => {
+              formik.setFieldValue("number", value);
+            }}
+          />
+          <span>{formik.touched.number && formik.errors.number}</span>
+        </div>
+        {/* <div>
           <PostalCodeInput
             name="postalCode"
             value={formik.values.postalCode}
@@ -201,7 +211,7 @@ function App() {
             ))}
           </select>
           <span>{formik.touched.fruit && formik.errors.fruit}</span>
-        </div>
+        </div> */}
         <div>
           <input
             type="submit"
@@ -213,15 +223,15 @@ function App() {
         </div>
       </form>
       <div style={{ marginTop: 30 }}>
-        <div>
+        {/* <div>
           <span>postalCode: </span>
           <span>{state.postalCode}</span>
-        </div>
+        </div> */}
         <div>
           <span>number: </span>
           <span>{state.number}</span>
         </div>
-        <div>
+        {/* <div>
           <span>number2: </span>
           <span>{state.number2}</span>
         </div>
@@ -236,7 +246,7 @@ function App() {
         <div>
           <span>fruit: </span>
           <span>{state.fruit}</span>
-        </div>
+        </div> */}
       </div>
     </div>
   );

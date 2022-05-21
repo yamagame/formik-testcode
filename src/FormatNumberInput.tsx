@@ -1,4 +1,5 @@
-import React, { InputHTMLAttributes, RefObject } from "react";
+import React, { InputHTMLAttributes } from "react";
+// import { TextField } from "./TextField";
 
 const formatString = (value: string, format: string) => {
   const result: string[] = [];
@@ -22,12 +23,19 @@ type FormatInputProps = {
   length?: number;
 } & InputHTMLAttributes<HTMLInputElement>;
 
+const zenkaku = "０１２３４５６７８９".split("");
+const reg = new RegExp("(" + zenkaku.join("|") + ")", "g");
+
 function numberString(val: string) {
-  const zenkaku = "０１２３４５６７８９".split("");
-  const reg = new RegExp("(" + zenkaku.join("|") + ")", "g");
   const ret = val
     .replace(reg, (match) => String(zenkaku.indexOf(match)))
     .replace(/[^0-9]/g, "");
+  return ret;
+}
+
+function isZenkakuString(val: string) {
+  const ret = reg.test(val);
+  console.log(`isZenkakuString ${val}`, ret);
   return ret;
 }
 
@@ -74,129 +82,165 @@ const delZenkaku = (str: string) => {
   return { inputValue: r, removedChar: count };
 };
 
-const isIME = (ref: RefObject<number>) => {
-  return ref.current === 229 || ref.current === 0;
-  // return ref.current;
-};
+// const isIME = (ref: RefObject<number>) => {
+//   const check = () => {
+//     if (navigator.userAgent.indexOf("Safari") >= 0) return false;
+//     return ref.current === 229 || ref.current === 0;
+//   };
+//   const ret = check();
+//   console.log(ret);
+//   return ret;
+//   // return ref.current;
+// };
+
+// type InputProps = JSX.IntrinsicElements["input"];
+// const FancyTextField = React.forwardRef<HTMLInputElement, inputProps>(
+//   (props, ref) => {
+//     return <TextField {...{ ...props, ref }} />;
+//   }
+// );
+// const FancyTextField = React.forwardRef<HTMLInputElement, inputProps>(
+//   (props, ref) => (
+//     <div>
+//       <input {...{ ...props, ref: ref }} />
+//     </div>
+//   )
+// );
+// interface Handles {
+//   customFunction: () => void;
+// }
+// interface Props {
+//   props1: string;
+//   ref: RefObject<HTMLInputElement>;
+// }
+
+// const component: React.ForwardRefRenderFunction<
+//   HTMLInputElement,
+//   InputProps
+// > = (props, ref) => {
+//   // React.useImperativeHandle(ref, () => ({
+//   //   customFunction: () => {
+//   //     console.log("Custom");
+//   //   },
+//   // }));
+//   return <TextField {...{ ...props, ref }} />;
+// };
+
+// const FancyTextField = React.forwardRef(component);
 
 export function FormatNumberInput(props: FormatInputProps) {
   const { format, name, value, onChange, length, ...rest } = props;
-  const [internalValue, setInternalValue] = React.useState(value);
+  const [internalValue, setInternalValue] = React.useState(String(value));
+  const keyCode = React.useRef("");
   const [focus, setFocus] = React.useState(false);
   const [start, setStart] = React.useState(0);
   const [end, setEnd] = React.useState(0);
+  const compositingRef = React.useRef(false);
   // const [compositing, setCopmositing] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
-  // const keyDownRef = React.useRef<boolean>(false);
-  const whichRef = React.useRef<number>(-1);
   React.useEffect(() => {
-    if (inputRef && inputRef.current && focus && !isIME(whichRef)) {
+    if (inputRef && inputRef.current && focus) {
       inputRef.current.setSelectionRange(start, end);
     }
   });
   const maxLength = length || 0;
-  const valueString = String(value || "");
-  console.log("valueString", valueString);
+  const valueString = String(value);
+  console.log(` externalValue ${valueString}`);
+  console.log(`internalValue ${internalValue}`);
   return (
     <input
       {...rest}
       ref={inputRef}
-      value={
-        isIME(whichRef)
-          ? internalValue
-          : formatString(valueString, pattern(format, valueString))
-      }
+      value={internalValue}
       onKeyDown={(e) => {
-        console.log("onkey", e.key);
-        console.log("isComposing", e.nativeEvent.isComposing);
-        console.log("which", e.which);
-        whichRef.current = e.which;
-        // whichRef.current = e.nativeEvent.isComposing;
-        // whichRef.current = e.which;
-        // console.log(isIME(whichRef));
-        // keyDownRef.current = true;
-      }}
-      onKeyUp={(e) => {
-        console.log("onup", e.key);
-        // keyDownRef.current = false;
+        keyCode.current = e.key;
+        console.log(e.key);
       }}
       onChange={(e) => {
-        if (isIME(whichRef)) {
-          setInternalValue(e.target.value);
-          // if (onChange) onChange(e);
-          // return;
-        }
-        // if (!keyDownRef.current) {
-        //   if (inputRef.current) inputRef.current.setSelectionRange(start, end);
+        console.log(`compositingRef.current  ${compositingRef.current}`, 0);
+        if (!inputRef.current) return;
+        const { selectionStart, selectionEnd, value } = e.target;
+        console.log(`>>>>>>> onChange ${value}`);
+        // if (keyCode.current === "Enter" || keyCode.current === "Backspace")
         //   return;
+        const { inputValue } = delZenkaku(value);
+        // const inputValue = value;
+        let numStr = numberString(inputValue);
+        if (props.maxLength && numStr.length > maxLength && maxLength > 0)
+          numStr = numStr.substring(0, maxLength);
+        const formatPattern = pattern(format, inputValue);
+        const formatValue = formatString(numStr, formatPattern);
+        const delta = calcCaretPosition(
+          inputValue,
+          selectionStart,
+          formatPattern
+        );
+        const omitSeparatorString = numberString(formatValue);
+        // if (isZenkakuString(valueString)) {
+        //   const end = Math.max(0, (selectionEnd || 0) + delta);
+        //   setStart(end);
+        //   setEnd(end);
+        //   setInternalValue(valueString);
+        // } else {
+        const start = Math.max(0, (selectionStart || 0) + delta);
+        const end = Math.max(0, (selectionEnd || 0) + delta);
+        setStart(start);
+        setEnd(end);
+        // if (isZenkakuString(value)) {
         // }
-        // keyDownRef.current = false;
-        {
-          const { selectionStart, selectionEnd, value } = e.target;
-          // e.nativeEvent.stopPropagation();
-          // console.log("value", value);
-          // const { inputValue, removedChar } = delZenkaku(value);
-          const removedChar = 0;
-          const inputValue = value;
-          // console.log("change", value);
-          // if (isIME(whichRef)) {
-          //   if (onChange) onChange(e);
-          //   return;
-          // }
-          let numStr = numberString(inputValue);
-          if (props.maxLength && numStr.length > maxLength && maxLength > 0)
-            numStr = numStr.substring(0, maxLength);
-          const formatPattern = pattern(format, inputValue);
-          const formatValue = formatString(numStr, formatPattern);
-          const delta = calcCaretPosition(
-            inputValue,
-            selectionStart,
-            formatPattern
-          );
-          const start = Math.max(
-            0,
-            (selectionStart || 0) + delta - removedChar
-          );
-          const end = Math.max(0, (selectionEnd || 0) + delta - removedChar);
-          setStart(start);
-          setEnd(end);
-          const omitSeparatorString = numberString(formatValue);
-          console.log("omitSeparatorString", omitSeparatorString);
-          const newValueEvent = {
-            ...e,
-            target: {
-              ...e.target,
-              name: name || "",
-              value: omitSeparatorString,
-            },
-          };
-          if (onChange) onChange(newValueEvent);
-        }
+        // if (isZenkakuString(value)) {
+        //   setInternalValue(value);
+        // } else {
+        setInternalValue(formatValue);
+        //         }
+        // }
+        console.log("omitSeparatorString", omitSeparatorString);
+        const newValueEvent = {
+          ...e,
+          target: {
+            ...e.target,
+            name: name || "",
+            value: omitSeparatorString,
+          },
+        };
+        inputRef.current.setSelectionRange(start, end);
+        // if (isZenkakuString(value)) {
+        // if (onChange) onChange(newValueEvent);
+        // } else {
+        if (onChange) onChange(newValueEvent);
+        // }
+        console.log(`compositingRef.current  ${compositingRef.current}`, 1);
       }}
       onBlur={() => {
         setFocus(false);
-        const value = numberString(valueString);
+        const value = numberString(internalValue);
         const s = formatString(value, pattern(format, value));
         setInternalValue(s);
+        console.log("## blur");
       }}
       onFocus={() => setFocus(true)}
       onCompositionStart={() => {
-        const s = formatString(valueString, pattern(format, valueString));
-        console.log("start", s);
+        // const s = formatString(valueString, pattern(format, valueString));
+        // console.log("start", s);
         // setCopmositing(true);
+        compositingRef.current = true;
       }}
       onCompositionUpdate={() => {
-        const s = formatString(valueString, pattern(format, valueString));
-        // if (inputRef.current) inputRef.current.value = s;
-        console.log("update", s);
+        //   const s = formatString(valueString, pattern(format, valueString));
+        //   // if (inputRef.current) inputRef.current.value = s;
+        //   console.log("update", s);
+        compositingRef.current = false;
       }}
-      onCompositionEnd={() => {
-        const value = numberString(valueString);
-        const s = formatString(value, pattern(format, value));
-        setInternalValue(s);
-        // if (inputRef.current) inputRef.current.value = s;
-        console.log("end", s);
-        // setCopmositing(false);
+      onCompositionEnd={(e) => {
+        // const value = numberString(valueString);
+        // const s = formatString(value, pattern(format, value));
+        // setInternalValue(s);
+        //   // if (inputRef.current) inputRef.current.value = s;
+        //   console.log("end", s, e.data);
+        // setStart(end);
+        // setEnd(end);
+        //   setCopmositing(false);
+        compositingRef.current = false;
       }}
     />
   );
