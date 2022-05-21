@@ -149,11 +149,10 @@ function App() {
             maxLength={16}
             autoComplete="off"
             onKeyDown={(e) => {
-              console.log(e.keyCode);
-              console.log(e.key);
+              console.log("key", e.key);
             }}
             onChange={(e) => {
-              console.log(e.target.value);
+              console.log("change", e.target.value);
               formik.handleChange(e);
             }}
             onBlur={(e) => {
