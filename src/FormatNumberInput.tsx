@@ -139,7 +139,7 @@ export function FormatNumberInput(props: FormatInputProps) {
   // const [compositing, setCopmositing] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
-    if (inputRef && inputRef.current && focus) {
+    if (inputRef && inputRef.current && focus && !compositingRef.current) {
       inputRef.current.setSelectionRange(start, end);
     }
   });
@@ -157,14 +157,23 @@ export function FormatNumberInput(props: FormatInputProps) {
         console.log(e.key);
       }}
       onChange={(e) => {
-        console.log(`compositingRef.current  ${compositingRef.current}`, 0);
-        if (!inputRef.current) return;
         const { selectionStart, selectionEnd, value } = e.target;
+        console.log(`compositingRef.current  ${compositingRef.current}`, 0);
+        if (compositingRef.current) {
+          setInternalValue(e.target.value);
+          const start = Math.max(0, selectionStart || 0);
+          const end = Math.max(0, selectionEnd || 0);
+          setStart(start);
+          setEnd(end);
+          if (onChange) onChange(e);
+          return;
+        }
+        if (!inputRef.current) return;
         console.log(`>>>>>>> onChange ${value}`);
         // if (keyCode.current === "Enter" || keyCode.current === "Backspace")
         //   return;
-        const { inputValue } = delZenkaku(value);
-        // const inputValue = value;
+        // const { inputValue } = delZenkaku(value);
+        const inputValue = value;
         let numStr = numberString(inputValue);
         if (props.maxLength && numStr.length > maxLength && maxLength > 0)
           numStr = numStr.substring(0, maxLength);
@@ -229,7 +238,7 @@ export function FormatNumberInput(props: FormatInputProps) {
         //   const s = formatString(valueString, pattern(format, valueString));
         //   // if (inputRef.current) inputRef.current.value = s;
         //   console.log("update", s);
-        compositingRef.current = false;
+        // compositingRef.current = false;
       }}
       onCompositionEnd={(e) => {
         // const value = numberString(valueString);
