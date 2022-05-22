@@ -30,3 +30,11 @@
 
 - onChangeValue
   値の変更が通知される。
+
+## Demo
+
+[https://yamagame.github.io/formik-testcode](https://yamagame.github.io/formik-testcode)
+
+## スライド
+
+[React form formik hooks](https://docs.google.com/presentation/d/1_EE5mQwlUWwl0VcHD7152ZC5eyXLyDQw_4gJzSn-XiA/edit?usp=sharing)
