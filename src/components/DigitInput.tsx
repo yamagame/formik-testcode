@@ -1,25 +1,21 @@
+import { InputHTMLAttributes } from "react";
 import { FormatNumberInput } from "../FormatNumberInput";
 
 type DigitInputProps = {
-  name: string;
-  value: string;
-  onChange: (value: string) => void;
-};
+  onChangeValue: (value: string) => void;
+} & InputHTMLAttributes<HTMLInputElement>;
 
 export function DigitInput(props: DigitInputProps) {
+  const { onChangeValue, ...rest } = props;
   return (
     <FormatNumberInput
       type="tel"
-      value={props.value}
-      placeholder={props.name}
-      name={props.name}
-      autoComplete="off"
       format="**** **** **** ****"
       maxLength={19}
       length={16}
+      {...rest}
       onChangeValue={(e) => {
-        const { value } = e;
-        props.onChange(value);
+        onChangeValue(e.value);
       }}
     />
   );

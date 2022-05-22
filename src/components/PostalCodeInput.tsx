@@ -1,25 +1,21 @@
+import { InputHTMLAttributes } from "react";
 import { FormatNumberInput } from "../FormatNumberInput";
 
 type PostalCodeInputProps = {
-  name: string;
-  placeholder: string;
-  value: string;
-  onChange: (value: string) => void;
-};
+  onChangeValue: (value: string) => void;
+} & InputHTMLAttributes<HTMLInputElement>;
 
 export function PostalCodeInput(props: PostalCodeInputProps) {
+  const { onChangeValue, ...rest } = props;
   return (
     <FormatNumberInput
       type="tel"
-      value={props.value}
-      placeholder={props.placeholder}
-      name={props.name}
       format="***-****"
       maxLength={8}
       length={7}
+      {...rest}
       onChangeValue={(e) => {
-        const { value } = e;
-        props.onChange(value);
+        onChangeValue(e.value);
       }}
     />
   );

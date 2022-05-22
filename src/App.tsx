@@ -58,6 +58,7 @@ type ForcusState = {
 };
 
 const validationSchema = (forcusState: ForcusState) => {
+  console.log("validationSchema");
   return yup.object().shape({
     postalCode: yup
       .string()
@@ -98,17 +99,36 @@ function numberString(val: string) {
 
 function App() {
   const [state, dispatch] = React.useReducer(submitReducer, submitInitialState);
+  const [count1, setCount1] = React.useState(0);
+  const [count2, setCount2] = React.useState(0);
   const focusStateRef = React.useRef<ForcusState>({});
 
   const formik = useFormik<FormProps>({
     initialValues: submitInitialState,
-    validateOnBlur: true,
+    validateOnBlur: false,
     validateOnChange: true,
     validationSchema: validationSchema(focusStateRef.current),
     onSubmit: (values) => {
       dispatch({ type: "update", payload: values });
     },
   });
+
+  React.useEffect(() => {
+    console.log(`count2: ${count2}`);
+    setCount1(count2);
+  }, [count2]);
+
+  React.useEffect(() => {
+    console.log(`count1: ${count1}`);
+    setCount2(count1);
+  }, [count1]);
+
+  const countUp = () => {
+    console.log("!");
+    setCount1((count) => count + 1);
+  };
+
+  console.log("render");
 
   return (
     <div style={{ margin: 30 }}>
@@ -129,9 +149,12 @@ function App() {
             name="postalCode"
             placeholder="postal-code"
             value={formik.values.postalCode}
-            onChange={(value: string) => {
+            autoComplete="off"
+            onChangeValue={(value: string) => {
+              console.log("$");
               formik.setFieldValue("postalCode", value);
             }}
+            onBlur={formik.handleBlur}
           />
           <span>{formik.touched.postalCode && formik.errors.postalCode}</span>
         </div>
@@ -140,19 +163,24 @@ function App() {
             name="date"
             placeholder="date"
             value={formik.values.date}
-            onChange={(value: string) => {
+            autoComplete="off"
+            onChangeValue={(value: string) => {
               formik.setFieldValue("date", value);
             }}
+            onBlur={formik.handleBlur}
           />
           <span>{formik.touched.date && formik.errors.date}</span>
         </div>
         <div>
           <DigitInput
             name="digit"
+            placeholder="digit"
             value={formik.values.digit}
-            onChange={(value: string) => {
+            autoComplete="off"
+            onChangeValue={(value: string) => {
               formik.setFieldValue("digit", value);
             }}
+            onBlur={formik.handleBlur}
           />
           <span>{formik.touched.digit && formik.errors.digit}</span>
         </div>
@@ -164,6 +192,7 @@ function App() {
             autoComplete="off"
             value={formik.values.name}
             onChange={(e) => {
+              console.log("$");
               formik.handleChange(e);
             }}
             onFocus={() => {
@@ -172,6 +201,7 @@ function App() {
             onBlur={(e) => {
               focusStateRef.current.name = false;
               formik.setFieldValue("name", e.target.value.toUpperCase());
+              formik.handleBlur(e);
             }}
           />
           <span>{formik.touched.name && formik.errors.name}</span>
@@ -198,7 +228,11 @@ function App() {
           <span>{formik.touched.text && formik.errors.text}</span>
         </div>
         <div>
-          <select name="fruit" onChange={formik.handleChange}>
+          <select
+            name="fruit"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+          >
             <option value="" label="Select a favorite Fruit" />
             {fruits.map((fruit) => (
               <option key={fruit.name} value={fruit.name}>
@@ -243,6 +277,12 @@ function App() {
           <span>fruit: </span>
           <span>{state.fruit}</span>
         </div>
+      </div>
+      <div style={{ marginTop: 30 }}>
+        <input type="button" value="count up" onClick={() => countUp()} />
+        <span>
+          {count1}:{count2}
+        </span>
       </div>
     </div>
   );

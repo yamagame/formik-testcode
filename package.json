@@ -23,6 +23,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "build:nocopy": "react-scripts build",
     "build": "PUBLIC_URL=/formik-testcode react-scripts build && rm -r docs && mv -f build docs",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

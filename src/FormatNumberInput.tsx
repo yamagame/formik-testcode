@@ -74,7 +74,8 @@ const findInput = (inputRef: HTMLInputElement) => {
 };
 
 export function FormatNumberInput(props: FormatInputProps) {
-  const { format, name, value, length, ...rest } = props;
+  const { format, value, length, onChangeValue, ...rest } = props;
+  const { name } = props;
 
   const [internalValue, setInternalValue] = React.useState(String(value));
   const [focus, setFocus] = React.useState(false);
@@ -113,12 +114,12 @@ export function FormatNumberInput(props: FormatInputProps) {
   };
 
   // 値を返す
-  const onChangeValue = (numberValue: string) => {
+  const changeValue = (numberValue: string) => {
     const newValueEvent = {
       name: name || "",
       value: numberValue,
     };
-    if (props.onChangeValue) props.onChangeValue(newValueEvent);
+    if (onChangeValue) onChangeValue(newValueEvent);
   };
 
   return (
@@ -136,8 +137,8 @@ export function FormatNumberInput(props: FormatInputProps) {
             const nextEnd = Math.max(0, end || 0);
             setStart(nextStart);
             setEnd(nextEnd);
-            if (props.onChangeValue)
-              props.onChangeValue({
+            if (onChangeValue)
+              onChangeValue({
                 name: name || "",
                 value: e.target.value,
               });
@@ -147,12 +148,13 @@ export function FormatNumberInput(props: FormatInputProps) {
           const inputValue = value;
           const numberValue = updateValue(inputValue, start, end);
           findInput(inputRef.current)?.setSelectionRange(start, end);
-          onChangeValue(numberValue);
+          changeValue(numberValue);
         }}
-        onBlur={() => {
+        onBlur={(e) => {
           setFocus(false);
           const { numberValue } = updateInternalValue(internalValue);
-          onChangeValue(numberValue);
+          changeValue(numberValue);
+          if (props.onBlur) props.onBlur(e);
         }}
         onFocus={() => setFocus(true)}
         onCompositionStart={() => {
@@ -163,7 +165,7 @@ export function FormatNumberInput(props: FormatInputProps) {
           // 日本語入力終了
           compositingRef.current = false;
           const numberValue = updateValue(internalValue, start, end);
-          onChangeValue(numberValue);
+          changeValue(numberValue);
         }}
       />
     </div>
