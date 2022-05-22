@@ -74,7 +74,8 @@ const findInput = (inputRef: HTMLInputElement) => {
 };
 
 export function FormatNumberInput(props: FormatInputProps) {
-  const { format, name, value, onChangeValue, length, ...rest } = props;
+  const { format, name, value, length, ...rest } = props;
+
   const [internalValue, setInternalValue] = React.useState(String(value));
   const [focus, setFocus] = React.useState(false);
   const [start, setStart] = React.useState(0);
@@ -86,83 +87,83 @@ export function FormatNumberInput(props: FormatInputProps) {
       findInput(inputRef.current)?.setSelectionRange(start, end);
     }
   });
-  const maxLength = length || 0;
+
+  // 値を整形し保持
+  const updateInternalValue = (inputValue: string) => {
+    const numberValue = numberString(inputValue, props.length);
+    const formatPattern = pattern(format, inputValue);
+    const formatedValue = formatString(numberValue, formatPattern);
+    setInternalValue(formatedValue);
+    return { numberValue, formatPattern };
+  };
+
+  // 値を整形しキャレット位置を計算
+  const updateValue = (
+    inputValue: string,
+    start: number | null,
+    end: number | null
+  ) => {
+    const { numberValue, formatPattern } = updateInternalValue(inputValue);
+    const delta = calcCaretPosition(inputValue, start, formatPattern);
+    const nextStart = Math.max(0, (start || 0) + delta);
+    const nextEnd = Math.max(0, (end || 0) + delta);
+    setStart(nextStart);
+    setEnd(nextEnd);
+    return numberValue;
+  };
+
+  // 値を返す
+  const onChangeValue = (numberValue: string) => {
+    const newValueEvent = {
+      name: name || "",
+      value: numberValue,
+    };
+    if (props.onChangeValue) props.onChangeValue(newValueEvent);
+  };
+
   return (
     <div ref={inputRef} style={{ display: "inline" }}>
       <TextField
         {...rest}
         value={internalValue}
         onChange={(e) => {
-          const { selectionStart, selectionEnd, value } = e.target;
+          const { selectionStart: start, selectionEnd: end, value } = e.target;
           if (!inputRef.current) return;
           if (compositingRef.current) {
+            // 日本語入力時は値を整形せず保持
             setInternalValue(e.target.value);
-            const start = Math.max(0, selectionStart || 0);
-            const end = Math.max(0, selectionEnd || 0);
-            setStart(start);
-            setEnd(end);
-            if (onChangeValue)
-              onChangeValue({
+            const nextStart = Math.max(0, start || 0);
+            const nextEnd = Math.max(0, end || 0);
+            setStart(nextStart);
+            setEnd(nextEnd);
+            if (props.onChangeValue)
+              props.onChangeValue({
                 name: name || "",
                 value: e.target.value,
               });
             return;
           }
+          // 入力した値から表示する値に整形
           const inputValue = value;
-          let numStr = numberString(inputValue);
-          if (props.maxLength && numStr.length > maxLength && maxLength > 0)
-            numStr = numStr.substring(0, maxLength);
-          const formatPattern = pattern(format, inputValue);
-          const formatedValue = formatString(numStr, formatPattern);
-          const delta = calcCaretPosition(
-            inputValue,
-            selectionStart,
-            formatPattern
-          );
-          const numberedValue = numberString(formatedValue, props.length);
-          const nextStart = Math.max(0, (selectionStart || 0) + delta);
-          const nextEnd = Math.max(0, (selectionEnd || 0) + delta);
-          setStart(nextStart);
-          setEnd(nextEnd);
-          setInternalValue(formatedValue);
-          const newValueEvent = {
-            name: name || "",
-            value: numberedValue,
-          };
+          const numberValue = updateValue(inputValue, start, end);
           findInput(inputRef.current)?.setSelectionRange(start, end);
-          if (onChangeValue) onChangeValue(newValueEvent);
+          onChangeValue(numberValue);
         }}
         onBlur={() => {
           setFocus(false);
-          const value = numberString(internalValue, props.length);
-          const formatedValue = formatString(value, pattern(format, value));
-          setInternalValue(formatedValue);
-          const newValueEvent = {
-            name: name || "",
-            value,
-          };
-          if (onChangeValue) onChangeValue(newValueEvent);
+          const { numberValue } = updateInternalValue(internalValue);
+          onChangeValue(numberValue);
         }}
         onFocus={() => setFocus(true)}
         onCompositionStart={() => {
+          // 日本語入力開始
           compositingRef.current = true;
         }}
         onCompositionEnd={() => {
+          // 日本語入力終了
           compositingRef.current = false;
-          const value = numberString(internalValue, props.length);
-          const formatedValue = formatString(value, pattern(format, value));
-          setInternalValue(formatedValue);
-          const formatPattern = pattern(format, internalValue);
-          const delta = calcCaretPosition(internalValue, start, formatPattern);
-          const nextStart = Math.max(0, (start || 0) + delta);
-          const nextEnd = Math.max(0, (end || 0) + delta);
-          setStart(nextStart);
-          setEnd(nextEnd);
-          const newValueEvent = {
-            name: name || "",
-            value,
-          };
-          if (onChangeValue) onChangeValue(newValueEvent);
+          const numberValue = updateValue(internalValue, start, end);
+          onChangeValue(numberValue);
         }}
       />
     </div>
