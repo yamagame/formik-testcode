@@ -105,8 +105,8 @@ function App() {
 
   const formik = useFormik<FormProps>({
     initialValues: submitInitialState,
-    validateOnBlur: false,
-    validateOnChange: true,
+    validateOnBlur: true, // default is true
+    validateOnChange: true, // default is true
     validationSchema: validationSchema(focusStateRef.current),
     onSubmit: (values) => {
       dispatch({ type: "update", payload: values });
