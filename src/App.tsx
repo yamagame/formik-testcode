@@ -200,8 +200,8 @@ function App() {
             }}
             onBlur={(e) => {
               focusStateRef.current.name = false;
-              formik.setFieldValue("name", e.target.value.toUpperCase());
               formik.handleBlur(e);
+              formik.setFieldValue("name", e.target.value.toUpperCase());
             }}
           />
           <span>{formik.touched.name && formik.errors.name}</span>
