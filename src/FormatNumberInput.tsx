@@ -77,7 +77,17 @@ export function FormatNumberInput(props: FormatInputProps) {
   const { format, value, length, onChangeValue, ...rest } = props;
   const { name } = props;
 
-  const [internalValue, setInternalValue] = React.useState(String(value));
+  // 値を整形
+  const formatedValue = (inputValue: string) => {
+    const numberValue = numberString(inputValue, props.length);
+    const formatPattern = pattern(format, inputValue);
+    const formatedValue = formatString(numberValue, formatPattern);
+    return formatedValue;
+  };
+
+  const [internalValue, setInternalValue] = React.useState(
+    formatedValue(String(value))
+  );
   const [focus, setFocus] = React.useState(false);
   const [start, setStart] = React.useState(0);
   const [end, setEnd] = React.useState(0);
