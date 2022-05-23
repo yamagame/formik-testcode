@@ -166,7 +166,10 @@ export function FormatNumberInput(props: FormatInputProps) {
           changeValue(numberValue);
           if (props.onBlur) props.onBlur(e);
         }}
-        onFocus={() => setFocus(true)}
+        onFocus={(e) => {
+          setFocus(true);
+          if (props.onFocus) props.onFocus(e);
+        }}
         onCompositionStart={() => {
           // 日本語入力開始
           compositingRef.current = true;
