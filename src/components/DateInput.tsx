@@ -1,5 +1,5 @@
 import { InputHTMLAttributes } from "react";
-import { FormatNumberInput } from "../FormatNumberInput";
+import { FormatNumberInput } from "components/FormatNumberInput";
 
 type DateInputProps = {
   onChangeValue: (value: string) => void;

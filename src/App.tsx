@@ -1,14 +1,14 @@
 import React from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { PostalCodeInput } from "./components/PostalCodeInput";
-import { DigitInput } from "./components/DigitInput";
+import { PostalCodeInput } from "components/PostalCodeInput";
+import { DigitInput } from "components/DigitInput";
 import {
   CreditCardInput,
   CreditCardDetector,
-} from "./components/CreditCardInput";
-import { DateInput } from "./components/DateInput";
-import { TextField } from "./components/TextField";
+} from "components/CreditCardInput";
+import { DateInput } from "components/DateInput";
+import { TextField } from "components/TextField";
 
 type FormProps = {
   postalCode: string;

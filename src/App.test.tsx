@@ -1,5 +1,5 @@
 import { render, screen, act } from "@testing-library/react";
-import App from "./App";
+import App from "App";
 import enzyme from "enzyme";
 
 const Adapter = require("enzyme-adapter-react-16");
