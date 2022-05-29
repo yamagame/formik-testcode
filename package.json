@@ -24,7 +24,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "vite build",
-    "build:copy": "PUBLIC_URL=/formik-testcode vite build && rm -rf docs && mv -f dist docs",
+    "build:copy": "vite build --base=/formik-testcode && rm -rf docs && mv -f dist docs",
     "dev": "vite serve",
     "preview": "vite preview",
     "test": "react-scripts test",
