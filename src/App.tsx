@@ -3,12 +3,17 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { PostalCodeInput } from "./components/PostalCodeInput";
 import { DigitInput } from "./components/DigitInput";
+import {
+  CreditCardInput,
+  CreditCardDetector,
+} from "./components/CreditCardInput";
 import { DateInput } from "./components/DateInput";
 import { TextField } from "./components/TextField";
 
 type FormProps = {
   postalCode: string;
   date: string;
+  creditcard: string;
   digit: string;
   text: string;
   name: string;
@@ -20,6 +25,7 @@ const fruits = [{ name: "apple" }, { name: "pine" }, { name: "orange" }];
 type SubmitState = {
   postalCode: string;
   date: string;
+  creditcard: string;
   digit: string;
   text: string;
   name: string;
@@ -29,6 +35,7 @@ type SubmitState = {
 const initialValues = {
   postalCode: "",
   date: "",
+  creditcard: "",
   digit: "",
   text: "",
   name: "",
@@ -51,6 +58,7 @@ function submitReducer(state: SubmitState, action: SubmitAction) {
 type ForcusState = {
   postalCode?: boolean;
   date?: boolean;
+  creditcard?: boolean;
   digit?: boolean;
   text?: boolean;
   name?: boolean;
@@ -68,6 +76,13 @@ const validationSchema = (forcusState: ForcusState) => {
       .string()
       .matches(/^[0-9]{4}[0-9]{2}[0-9]{2}$/)
       .required(),
+    creditcard: yup.lazy((creditcard) => {
+      return yup
+        .string()
+        .matches(/^[0-9]+$/)
+        .length(CreditCardDetector.getInfo(creditcard, false).length)
+        .required();
+    }),
     digit: yup
       .string()
       .matches(/^[0-9]{4}[0-9]{4}[0-9]{4}[0-9]{4}$/)
@@ -172,6 +187,26 @@ function App() {
           <span>{formik.touched.date && formik.errors.date}</span>
         </div>
         <div>
+          <CreditCardInput
+            name="creditcard"
+            placeholder="credit-card"
+            value={formik.values.creditcard}
+            autoComplete="off"
+            onChangeValue={(value: string) => {
+              formik.setFieldValue("creditcard", value);
+            }}
+            onFocus={() => {
+              focusStateRef.current.creditcard = true;
+            }}
+            onBlur={(e) => {
+              focusStateRef.current.name = false;
+              formik.handleBlur(e);
+              formik.setFieldValue("creditcard", formik.values.creditcard);
+            }}
+          />
+          <span>{formik.touched.creditcard && formik.errors.creditcard}</span>
+        </div>
+        <div>
           <DigitInput
             name="digit"
             placeholder="digit"
@@ -192,7 +227,6 @@ function App() {
             autoComplete="off"
             value={formik.values.name}
             onChange={(e) => {
-              console.log("$");
               formik.handleChange(e);
             }}
             onFocus={() => {
@@ -248,6 +282,7 @@ function App() {
             value="submit"
             onClick={() => {
               focusStateRef.current.name = false;
+              focusStateRef.current.creditcard = false;
             }}
           />
         </div>
@@ -260,6 +295,10 @@ function App() {
         <div>
           <span>date: </span>
           <span>{state.date}</span>
+        </div>
+        <div>
+          <span>credit card: </span>
+          <span>{state.creditcard}</span>
         </div>
         <div>
           <span>digit: </span>
