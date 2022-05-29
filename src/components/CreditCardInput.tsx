@@ -102,7 +102,7 @@ export const CreditCardDetector = {
         ? this.getStrictBlocks(matchedBlocks)
         : matchedBlocks;
       return {
-        type: foundKey,
+        type: keys[foundKey],
         format: formatString(block),
         length: block.reduce((s, v) => s + v, 0),
       };
