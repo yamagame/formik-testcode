@@ -321,6 +321,14 @@ function App() {
         </div>
       </div>
       <div style={{ marginTop: 30 }}>
+        <input
+          type="button"
+          value="copy digit to creditcard"
+          onClick={() => {
+            formik.setFieldValue("creditcard", formik.values.digit);
+          }}
+        />
+        <div />
         <input type="button" value="count up" onClick={() => countUp()} />
         <span>
           {count1}:{count2}

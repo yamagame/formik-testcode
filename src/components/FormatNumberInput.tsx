@@ -85,9 +85,9 @@ export function FormatNumberInput(props: FormatInputProps) {
     return formatedValue;
   };
 
-  const [internalValue, setInternalValue] = React.useState(
-    formatedValue(String(value))
-  );
+  const stateValue = formatedValue(String(value));
+
+  const [internalValue, setInternalValue] = React.useState(stateValue);
   const [focus, setFocus] = React.useState(false);
   const [start, setStart] = React.useState(0);
   const [end, setEnd] = React.useState(0);
@@ -98,6 +98,12 @@ export function FormatNumberInput(props: FormatInputProps) {
       findInput(inputRef.current)?.setSelectionRange(start, end);
     }
   });
+
+  React.useEffect(() => {
+    if (!focus && !compositingRef.current) {
+      setInternalValue(stateValue);
+    }
+  }, [stateValue, focus]);
 
   // 値を整形し保持
   const updateInternalValue = (inputValue: string) => {
