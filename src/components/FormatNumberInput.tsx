@@ -99,6 +99,7 @@ export function FormatNumberInput(props: FormatInputProps) {
     }
   });
 
+  // 値が変化したら再設定
   React.useEffect(() => {
     if (!focus && !compositingRef.current) {
       setInternalValue(stateValue);
