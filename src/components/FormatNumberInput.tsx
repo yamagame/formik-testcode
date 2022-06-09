@@ -155,7 +155,7 @@ export function FormatNumberInput(props: FormatInputProps) {
         {...rest}
         value={internalValue}
         onKeyDown={(e) => {
-          keyCodeRef.current = e.nativeEvent.code;
+          keyCodeRef.current = e.key;
         }}
         onChange={(e) => {
           const { selectionStart, selectionEnd, value } = e.target;
