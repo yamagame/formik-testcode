@@ -16,6 +16,14 @@ const formatString = (value: string, format: string) => {
     if (ch === "*") {
       result.push(value[pos]);
       pos++;
+      if (pos === value.length) {
+        if (i + 1 < format.length) {
+          const ch = format[i + 1];
+          if (ch !== "*") {
+            result.push(ch);
+          }
+        }
+      }
     } else {
       result.push(ch);
     }
@@ -93,6 +101,7 @@ export function FormatNumberInput(props: FormatInputProps) {
   const [end, setEnd] = React.useState(0);
   const compositingRef = React.useRef(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const keyCodeRef = React.useRef("");
   React.useEffect(() => {
     if (inputRef && inputRef.current && focus && !compositingRef.current) {
       findInput(inputRef.current)?.setSelectionRange(start, end);
@@ -144,14 +153,19 @@ export function FormatNumberInput(props: FormatInputProps) {
       <TextField
         {...rest}
         value={internalValue}
+        onKeyDown={(e) => {
+          keyCodeRef.current = e.nativeEvent.code;
+        }}
         onChange={(e) => {
-          const { selectionStart: start, selectionEnd: end, value } = e.target;
+          const { selectionStart, selectionEnd, value } = e.target;
+          let startPos = selectionStart || 0;
+          let endPos = selectionEnd || 0;
           if (!inputRef.current) return;
           if (compositingRef.current) {
             // 日本語入力時は値を整形せず保持
             setInternalValue(e.target.value);
-            const nextStart = Math.max(0, start || 0);
-            const nextEnd = Math.max(0, end || 0);
+            const nextStart = Math.max(0, startPos || 0);
+            const nextEnd = Math.max(0, endPos || 0);
             setStart(nextStart);
             setEnd(nextEnd);
             if (onChangeValue)
@@ -161,10 +175,38 @@ export function FormatNumberInput(props: FormatInputProps) {
               });
             return;
           }
+          let inputValue = value;
+          if (internalValue.length - value.length === 1) {
+            //　1文字削除された
+            const t =
+              startPos < value.length ? numberString(value[startPos]) : "";
+            const v = numberString(internalValue[startPos]);
+            if (v === "") {
+              // 削除した文字が数字以外
+              if (t === "") {
+                inputValue =
+                  value.substring(0, startPos - 1) + value.substring(startPos);
+                startPos = startPos - 1;
+                endPos = startPos;
+              } else {
+                if (keyCodeRef.current === "Backspace") {
+                  // Backspaceの場合
+                  inputValue =
+                    value.substring(0, startPos - 1) +
+                    value.substring(startPos);
+                  startPos = startPos - 1;
+                  endPos = startPos;
+                } else {
+                  // Deleteの場合
+                  inputValue =
+                    value.substring(0, startPos) +
+                    value.substring(startPos + 1);
+                }
+              }
+            }
+          }
           // 入力した値から表示する値に整形
-          const inputValue = value;
-          const numberValue = updateValue(inputValue, start, end);
-          findInput(inputRef.current)?.setSelectionRange(start, end);
+          const numberValue = updateValue(inputValue, startPos, endPos);
           changeValue(numberValue);
         }}
         onBlur={(e) => {
