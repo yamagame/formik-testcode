@@ -43,19 +43,14 @@ const zenkaku = "０１２３４５６７８９".split("");
 const reg = new RegExp("(" + zenkaku.join("|") + ")", "g");
 
 function numberString(val: string, length = 0) {
-  const ret = val
-    .replace(reg, (match) => String(zenkaku.indexOf(match)))
-    .replace(/[^0-9]/g, "");
+  const ret = val.replace(reg, match => String(zenkaku.indexOf(match))).replace(/[^0-9]/g, "");
   if (length > 0) return ret.substring(0, length);
   return ret;
 }
 
 function countSep(val: string, start?: number) {
   if (start) {
-    return (
-      val.substring(0, start).length -
-      numberString(val.substring(0, start)).length
-    );
+    return val.substring(0, start).length - numberString(val.substring(0, start)).length;
   }
   return val.length - numberString(val).length;
 }
@@ -67,10 +62,7 @@ function calcCaretPosition(
 ) {
   const numSep = countSep(inputString, selectionStart || 0);
   const start = (selectionStart || 0) - numSep;
-  const formatStr = formatString(
-    numberString(inputString).substring(0, start),
-    formatPattern
-  );
+  const formatStr = formatString(numberString(inputString).substring(0, start), formatPattern);
   return formatStr.length - (selectionStart || 0);
 }
 
@@ -154,10 +146,10 @@ export function FormatNumberInput(props: FormatInputProps) {
       <TextField
         {...rest}
         value={internalValue}
-        onKeyDown={(e) => {
+        onKeyDown={e => {
           keyCodeRef.current = e.key;
         }}
-        onChange={(e) => {
+        onChange={e => {
           const { selectionStart, selectionEnd, value } = e.target;
           let startPos = selectionStart || 0;
           let endPos = selectionEnd || 0;
@@ -180,50 +172,40 @@ export function FormatNumberInput(props: FormatInputProps) {
           let caretOffset = 0;
           if (internalValue.length - value.length === 1) {
             //　1文字削除された
-            const t =
-              startPos < value.length ? numberString(value[startPos]) : "";
+            const t = startPos < value.length ? numberString(value[startPos]) : "";
             const v = numberString(internalValue[startPos]);
             if (v === "") {
               // 削除した文字が数字以外
               if (t === "") {
-                inputValue =
-                  value.substring(0, startPos - 1) + value.substring(startPos);
+                console.log("A");
+                inputValue = value.substring(0, startPos - 1) + value.substring(startPos);
                 startPos = startPos - 1;
                 endPos = startPos;
               } else {
                 if (keyCodeRef.current === "Backspace") {
                   // Backspaceの場合
-                  inputValue =
-                    value.substring(0, startPos - 1) +
-                    value.substring(startPos);
+                  inputValue = value.substring(0, startPos - 1) + value.substring(startPos);
                   startPos = startPos - 1;
                   endPos = startPos;
                 } else {
                   // Deleteの場合
-                  inputValue =
-                    value.substring(0, startPos) +
-                    value.substring(startPos + 1);
+                  inputValue = value.substring(0, startPos) + value.substring(startPos + 1);
                   caretOffset = -1;
                 }
               }
             }
           }
           // 入力した値から表示する値に整形
-          const numberValue = updateValue(
-            inputValue,
-            startPos,
-            endPos,
-            caretOffset
-          );
+          const numberValue = updateValue(inputValue, startPos, endPos, caretOffset);
           changeValue(numberValue);
         }}
-        onBlur={(e) => {
+        onBlur={e => {
           setFocus(false);
           const { numberValue } = updateInternalValue(internalValue);
           changeValue(numberValue);
           if (props.onBlur) props.onBlur(e);
         }}
-        onFocus={(e) => {
+        onFocus={e => {
           setFocus(true);
           if (props.onFocus) props.onFocus(e);
         }}

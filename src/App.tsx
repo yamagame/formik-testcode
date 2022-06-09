@@ -3,10 +3,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { PostalCodeInput } from "components/PostalCodeInput";
 import { DigitInput } from "components/DigitInput";
-import {
-  CreditCardInput,
-  CreditCardDetector,
-} from "components/CreditCardInput";
+import { CreditCardInput, CreditCardDetector } from "components/CreditCardInput";
 import { DateInput } from "components/DateInput";
 import { TextField } from "components/TextField";
 
@@ -76,7 +73,7 @@ const validationSchema = (forcusState: ForcusState) => {
       .string()
       .matches(/^[0-9]{4}[0-9]{2}[0-9]{2}$/)
       .required(),
-    creditcard: yup.lazy((creditcard) => {
+    creditcard: yup.lazy(creditcard => {
       return yup
         .string()
         .matches(/^[0-9]+$/)
@@ -87,7 +84,7 @@ const validationSchema = (forcusState: ForcusState) => {
       .string()
       .matches(/^[0-9]{4}[0-9]{4}[0-9]{4}[0-9]{4}$/)
       .required(),
-    name: yup.lazy((name) => {
+    name: yup.lazy(name => {
       if (forcusState.name) {
         return yup
           .string()
@@ -115,7 +112,7 @@ function App() {
     validateOnBlur: true, // default is true
     validateOnChange: true, // default is true
     validationSchema: validationSchema(focusStateRef.current),
-    onSubmit: (values) => {
+    onSubmit: values => {
       dispatch({ type: "update", payload: values });
     },
   });
@@ -132,12 +129,12 @@ function App() {
 
   const countUp = () => {
     console.log("!");
-    setCount1((count) => count + 1);
+    setCount1(count => count + 1);
   };
 
   console.log("render");
 
-  const cardbland = CreditCardDetector.getInfo(formik.values.creditcard).type;
+  const cardbrand = CreditCardDetector.getInfo(formik.values.creditcard).type;
 
   return (
     <div style={{ margin: 30 }}>
@@ -153,16 +150,15 @@ function App() {
       {visibleFlag && (
         <div>
           <form
-            onSubmit={(e) => {
+            onSubmit={e => {
               formik.handleSubmit(e);
             }}
-            onKeyDown={(e) => {
+            onKeyDown={e => {
               if (e.key === "Enter") {
                 focusStateRef.current.name = false;
                 formik.handleSubmit();
               }
-            }}
-          >
+            }}>
             <div>
               <PostalCodeInput
                 name="postalCode"
@@ -175,9 +171,7 @@ function App() {
                 }}
                 onBlur={formik.handleBlur}
               />
-              <span>
-                {formik.touched.postalCode && formik.errors.postalCode}
-              </span>
+              <span>{formik.touched.postalCode && formik.errors.postalCode}</span>
             </div>
             <div>
               <DateInput
@@ -204,19 +198,15 @@ function App() {
                 onFocus={() => {
                   focusStateRef.current.creditcard = true;
                 }}
-                onBlur={(e) => {
+                onBlur={e => {
                   focusStateRef.current.name = false;
                   formik.handleBlur(e);
                   formik.setFieldValue("creditcard", formik.values.creditcard);
                 }}
               />
-              <span>
-                {formik.touched.creditcard && formik.errors.creditcard}
-              </span>
+              <span>{formik.touched.creditcard && formik.errors.creditcard}</span>
             </div>
-            <div style={{ fontSize: 12, margin: 4 }}>
-              Card Bland: {cardbland}
-            </div>
+            <div style={{ fontSize: 12, margin: 4 }}>Card brand: {cardbrand}</div>
             <div>
               <DigitInput
                 name="digit"
@@ -237,13 +227,13 @@ function App() {
                 name="name"
                 autoComplete="off"
                 value={formik.values.name}
-                onChange={(e) => {
+                onChange={e => {
                   formik.handleChange(e);
                 }}
                 onFocus={() => {
                   focusStateRef.current.name = true;
                 }}
-                onBlur={(e) => {
+                onBlur={e => {
                   focusStateRef.current.name = false;
                   formik.handleBlur(e);
                   formik.setFieldValue("name", e.target.value.toUpperCase());
@@ -258,10 +248,10 @@ function App() {
                 value={formik.values.text}
                 maxLength={16}
                 autoComplete="off"
-                onChange={(e) => {
+                onChange={e => {
                   formik.handleChange(e);
                 }}
-                onBlur={(e) => {
+                onBlur={e => {
                   formik.handleBlur(e);
                 }}
               />
@@ -272,10 +262,9 @@ function App() {
                 name="fruit"
                 value={formik.values.fruit}
                 onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              >
+                onBlur={formik.handleBlur}>
                 <option value="" label="Select a favorite Fruit" />
-                {fruits.map((fruit) => (
+                {fruits.map(fruit => (
                   <option key={fruit.name} value={fruit.name}>
                     {fruit.name}
                   </option>
