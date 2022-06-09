@@ -129,7 +129,7 @@ export function FormatNumberInput(props: FormatInputProps) {
     inputValue: string,
     start: number | null,
     end: number | null,
-    offset: number
+    offset = 0
   ) => {
     const { numberValue, formatPattern } = updateInternalValue(inputValue);
     const delta = calcCaretPosition(inputValue, start, formatPattern) + offset;
