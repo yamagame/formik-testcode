@@ -128,10 +128,11 @@ export function FormatNumberInput(props: FormatInputProps) {
   const updateValue = (
     inputValue: string,
     start: number | null,
-    end: number | null
+    end: number | null,
+    offset: number
   ) => {
     const { numberValue, formatPattern } = updateInternalValue(inputValue);
-    const delta = calcCaretPosition(inputValue, start, formatPattern);
+    const delta = calcCaretPosition(inputValue, start, formatPattern) + offset;
     const nextStart = Math.max(0, (start || 0) + delta);
     const nextEnd = Math.max(0, (end || 0) + delta);
     setStart(nextStart);
@@ -176,6 +177,7 @@ export function FormatNumberInput(props: FormatInputProps) {
             return;
           }
           let inputValue = value;
+          let caretOffset = 0;
           if (internalValue.length - value.length === 1) {
             //　1文字削除された
             const t =
@@ -201,12 +203,18 @@ export function FormatNumberInput(props: FormatInputProps) {
                   inputValue =
                     value.substring(0, startPos) +
                     value.substring(startPos + 1);
+                  caretOffset = -1;
                 }
               }
             }
           }
           // 入力した値から表示する値に整形
-          const numberValue = updateValue(inputValue, startPos, endPos);
+          const numberValue = updateValue(
+            inputValue,
+            startPos,
+            endPos,
+            caretOffset
+          );
           changeValue(numberValue);
         }}
         onBlur={(e) => {
