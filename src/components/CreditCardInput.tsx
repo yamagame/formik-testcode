@@ -92,15 +92,11 @@ export const CreditCardDetector = {
     strictMode = !!strictMode;
 
     const keys = Object.keys(re);
-    const foundKey = keys.findIndex((key) =>
-      re[key as keyof typeof re].test(value)
-    );
+    const foundKey = keys.findIndex((key) => re[key as keyof typeof re].test(value));
 
     if (foundKey >= 0) {
       const matchedBlocks = blocks[keys[foundKey] as keyof typeof blocks];
-      const block = strictMode
-        ? this.getStrictBlocks(matchedBlocks)
-        : matchedBlocks;
+      const block = strictMode ? this.getStrictBlocks(matchedBlocks) : matchedBlocks;
       return {
         type: keys[foundKey],
         format: formatString(block),
@@ -108,9 +104,7 @@ export const CreditCardDetector = {
       };
     }
 
-    const block = strictMode
-      ? this.getStrictBlocks(blocks.general)
-      : blocks.general;
+    const block = strictMode ? this.getStrictBlocks(blocks.general) : blocks.general;
     return {
       type: "unknown",
       format: formatString(block),
@@ -126,10 +120,7 @@ type DigitInputProps = {
 
 export function CreditCardInput(props: DigitInputProps) {
   const { onChangeValue, strictMode, ...rest } = props;
-  const cardInfo = CreditCardDetector.getInfo(
-    String(props.value || ""),
-    strictMode
-  );
+  const cardInfo = CreditCardDetector.getInfo(String(props.value || ""), strictMode);
   return (
     <FormatNumberInput
       type="tel"

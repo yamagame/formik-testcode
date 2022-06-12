@@ -3,10 +3,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { PostalCodeInput } from "components/PostalCodeInput";
 import { DigitInput } from "components/DigitInput";
-import {
-  CreditCardInput,
-  CreditCardDetector,
-} from "components/CreditCardInput";
+import { CreditCardInput, CreditCardDetector } from "components/CreditCardInput";
 import { DateInput } from "components/DateInput";
 import { TextField } from "components/TextField";
 
@@ -43,6 +40,15 @@ const initialValues = {
 };
 
 const submitInitialState: SubmitState = initialValues;
+const defaultInitialState: SubmitState = {
+  postalCode: "8102345",
+  date: "20010924",
+  creditcard: "123456788765432",
+  digit: "1111222233334444",
+  text: "Hello World",
+  name: "TARO",
+  fruit: "apple",
+};
 
 type SubmitAction = { type: "update"; payload: SubmitState };
 
@@ -100,11 +106,12 @@ const validationSchema = (forcusState: ForcusState) => {
         .required();
     }),
     fruit: yup.string().required(),
+    text: yup.string(),
   });
 };
 
 function App() {
-  const [state, dispatch] = React.useReducer(submitReducer, submitInitialState);
+  const [state, dispatch] = React.useReducer(submitReducer, defaultInitialState);
   const [count1, setCount1] = React.useState(0);
   const [count2, setCount2] = React.useState(0);
   const [visibleFlag, setVisibleFlag] = React.useState(true);
@@ -175,9 +182,7 @@ function App() {
                 }}
                 onBlur={formik.handleBlur}
               />
-              <span>
-                {formik.touched.postalCode && formik.errors.postalCode}
-              </span>
+              <span>{formik.touched.postalCode && formik.errors.postalCode}</span>
             </div>
             <div>
               <DateInput
@@ -210,13 +215,9 @@ function App() {
                   formik.setFieldValue("creditcard", formik.values.creditcard);
                 }}
               />
-              <span>
-                {formik.touched.creditcard && formik.errors.creditcard}
-              </span>
+              <span>{formik.touched.creditcard && formik.errors.creditcard}</span>
             </div>
-            <div style={{ fontSize: 12, margin: 4 }}>
-              Card Bland: {cardbland}
-            </div>
+            <div style={{ fontSize: 12, margin: 4 }}>Card Bland: {cardbland}</div>
             <div>
               <DigitInput
                 name="digit"
@@ -258,12 +259,8 @@ function App() {
                 value={formik.values.text}
                 maxLength={16}
                 autoComplete="off"
-                onChange={(e) => {
-                  formik.handleChange(e);
-                }}
-                onBlur={(e) => {
-                  formik.handleBlur(e);
-                }}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
               <span>{formik.touched.text && formik.errors.text}</span>
             </div>
@@ -335,6 +332,15 @@ function App() {
               }}
             />
             <div />
+            <input
+              type="button"
+              value="clear"
+              onClick={() => {
+                Object.entries(state).forEach(([key, value]) => {
+                  formik.setFieldValue(key, "");
+                });
+              }}
+            />
             <input type="button" value="count up" onClick={() => countUp()} />
             <span>
               {count1}:{count2}
