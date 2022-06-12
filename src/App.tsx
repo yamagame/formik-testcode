@@ -72,7 +72,6 @@ type ForcusState = {
 };
 
 const validationSchema = (forcusState: ForcusState) => {
-  console.log("validationSchema");
   return yup.object().shape({
     postalCode: yup
       .string()
@@ -142,8 +141,6 @@ function App() {
     setCount1((count) => count + 1);
   };
 
-  console.log("render");
-
   const cardbrand = CreditCardDetector.getInfo(formik.values.creditcard).type;
 
   return (
@@ -177,7 +174,6 @@ function App() {
                 value={formik.values.postalCode}
                 autoComplete="off"
                 onChangeValue={(value: string) => {
-                  console.log("$");
                   formik.setFieldValue("postalCode", value);
                 }}
                 onBlur={formik.handleBlur}
@@ -325,20 +321,24 @@ function App() {
             <input
               type="button"
               value="copy value to form"
-              onClick={() => {
+              onClick={async () => {
+                await formik.validateForm();
                 Object.entries(state).forEach(([key, value]) => {
                   formik.setFieldValue(key, value);
                 });
+                await formik.validateForm();
               }}
             />
             <div />
             <input
               type="button"
               value="clear"
-              onClick={() => {
+              onClick={async () => {
+                await formik.validateForm();
                 Object.entries(state).forEach(([key, value]) => {
                   formik.setFieldValue(key, "");
                 });
+                await formik.validateForm();
               }}
             />
             <input type="button" value="count up" onClick={() => countUp()} />
