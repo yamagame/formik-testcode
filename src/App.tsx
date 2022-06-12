@@ -144,7 +144,7 @@ function App() {
 
   console.log("render");
 
-  const cardbland = CreditCardDetector.getInfo(formik.values.creditcard).type;
+  const cardbrand = CreditCardDetector.getInfo(formik.values.creditcard).type;
 
   return (
     <div style={{ margin: 30 }}>
@@ -217,7 +217,7 @@ function App() {
               />
               <span>{formik.touched.creditcard && formik.errors.creditcard}</span>
             </div>
-            <div style={{ fontSize: 12, margin: 4 }}>Card Bland: {cardbland}</div>
+            <div style={{ fontSize: 12, margin: 4 }}>Card brand: {cardbrand}</div>
             <div>
               <DigitInput
                 name="digit"
