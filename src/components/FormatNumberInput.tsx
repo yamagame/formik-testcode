@@ -89,6 +89,7 @@ export function FormatNumberInput(props: FormatInputProps) {
   const stateValue = formatedValue(String(value));
 
   const [internalValue, setInternalValue] = React.useState(stateValue);
+  const changeRef = React.useRef(false);
   const focusRef = React.useRef(false);
   const [start, setStart] = React.useState(0);
   const [end, setEnd] = React.useState(0);
@@ -96,7 +97,13 @@ export function FormatNumberInput(props: FormatInputProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const keyCodeRef = React.useRef("");
   React.useEffect(() => {
-    if (inputRef && inputRef.current && focusRef.current && !compositingRef.current) {
+    if (
+      inputRef &&
+      inputRef.current &&
+      focusRef.current &&
+      !compositingRef.current &&
+      changeRef.current
+    ) {
       findInput(inputRef.current)?.setSelectionRange(start, end);
     }
   });
@@ -151,6 +158,7 @@ export function FormatNumberInput(props: FormatInputProps) {
           keyCodeRef.current = e.key;
         }}
         onChange={(e) => {
+          changeRef.current = true;
           const { selectionStart, selectionEnd, value } = e.target;
           let startPos = selectionStart || 0;
           let endPos = selectionEnd || 0;
@@ -207,6 +215,7 @@ export function FormatNumberInput(props: FormatInputProps) {
         }}
         onFocus={(e) => {
           focusRef.current = true;
+          changeRef.current = false;
           if (props.onFocus) props.onFocus(e);
         }}
         onCompositionStart={() => {
